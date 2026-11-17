@@ -8,24 +8,24 @@
     ['ا', 'আলিফ', 'আ', 'a', 'A straight line. On its own it carries a vowel; after a letter it stretches the “a” sound.', 0, 'এডাল পোন ৰেখা। অকলে থাকিলে ই স্বৰধ্বনি বহন কৰে; আন আখৰৰ পিছত থাকিলে “আ” ধ্বনিটো দীঘল কৰে।'],
     ['ب', 'বা', 'ব', 'b', 'Like ব. One dot below.', 1, 'ব-ৰ দৰে। তলত এটা ফুট।'],
     ['ت', 'তা', 'ত', 't', 'Like ত. Two dots above.', 1, 'ত-ৰ দৰে। ওপৰত দুটা ফুট।'],
-    ['ث', 'ছা', 'ছ', 'th', 'Soft “th” as in “think”: tip of the tongue between the teeth. Three dots above.', 1, 'ইংৰাজী “think”-ৰ “th”-ৰ দৰে কোমল ধ্বনি: জিভাৰ আগ দাঁতৰ মাজত ৰাখক। ওপৰত তিনিটা ফুট।'],
-    ['ج', 'জীম', 'জ', 'j', 'Like “j” in “jam”. One dot inside.', 1, 'ইংৰাজী “jam”-ৰ “j”-ৰ দৰে। ভিতৰত এটা ফুট।'],
+    ['ث', 'ছা', 'ছ', 'th', 'Soft “th” as in “think”: tip of the tongue between the teeth. Three dots above.', 1, 'কোমল “ছ”: জিভাৰ আগ ওপৰ আৰু তলৰ দাঁতৰ মাজত হালকাকৈ ৰাখি বতাহ এৰক, মাত নালাগে। ওপৰত তিনিটা ফুট।'],
+    ['ج', 'জীম', 'জ', 'j', 'Like “j” in “jam”. One dot inside.', 1, 'জ-ৰ দৰে। ভিতৰত এটা ফুট।'],
     ['ح', 'হা', 'হ', 'ḥ', 'A breathy হ from the middle of the throat, like breathing on a mirror. No dot.', 1, 'ডিঙিৰ মাজভাগৰ পৰা ওলোৱা উশাহযুক্ত হ — আইনাত উশাহ এৰাৰ দৰে। ফুট নাই।'],
     ['خ', 'খা', 'খ', 'kh', 'A rough খ from the top of the throat. One dot above.', 1, 'ডিঙিৰ ওপৰভাগৰ পৰা ওলোৱা খহটা খ। ওপৰত এটা ফুট।'],
     ['د', 'দাল', 'দ', 'd', 'Like দ.', 0, 'দ-ৰ দৰে।'],
-    ['ذ', 'যাল', 'য', 'dh', '“th” as in “this”: tongue tip between the teeth, with voice. One dot above.', 0, 'ইংৰাজী “this”-ৰ “th”-ৰ দৰে: জিভাৰ আগ দাঁতৰ মাজত, মাতৰ সৈতে। ওপৰত এটা ফুট।'],
+    ['ذ', 'যাল', 'য', 'dh', '“th” as in “this”: tongue tip between the teeth, with voice. One dot above.', 0, 'কোমল “য”: জিভাৰ আগ ওপৰ আৰু তলৰ দাঁতৰ মাজত ৰাখি মাতৰ সৈতে উচ্চাৰণ কৰক। ওপৰত এটা ফুট।'],
     ['ر', 'ৰা', 'ৰ', 'r', 'Like ৰ — a light tap of the tongue.', 0, 'ৰ-ৰ দৰে — জিভাৰ এটা পাতল টোকৰ।'],
-    ['ز', 'যা', 'য', 'z', 'A buzzing “z” as in “zoo”. One dot above.', 0, 'ইংৰাজী “zoo”-ৰ “z”-ৰ দৰে গুণগুণীয়া ধ্বনি। ওপৰত এটা ফুট।'],
-    ['س', 'ছীন', 'ছ', 's', 'A thin, clear “s”. Three small teeth.', 1, 'পাতল, স্পষ্ট “s” ধ্বনি। তিনিটা সৰু দাঁত।'],
-    ['ش', 'শ্বীন', 'শ্ব', 'sh', '“sh” as in “ship”. Three dots above.', 1, 'ইংৰাজী “ship”-ৰ “sh”-ৰ দৰে। ওপৰত তিনিটা ফুট।'],
-    ['ص', 'ছাদ', 'ছ', 'ṣ', 'A heavy “s”: raise the back of the tongue and fill the mouth.', 1, 'গধুৰ “s”: জিভাৰ পিছভাগ ওপৰলৈ তুলি মুখ ভৰাই উচ্চাৰণ কৰক।'],
-    ['ض', 'দ্বাদ', 'দ্ব', 'ḍ', 'A heavy “d” made with the side of the tongue against the upper back teeth.', 1, 'গধুৰ “d”: জিভাৰ কাষ ওপৰৰ পিছফালৰ দাঁতত লগাই উচ্চাৰণ কৰক।'],
-    ['ط', 'ত্বা', 'ত্ব', 'ṭ', 'A heavy, full-mouth “t”.', 1, 'গধুৰ, মুখ ভৰা “t”।'],
-    ['ظ', 'যা', 'য', 'ẓ', 'A heavy “dh”: tongue tip between the teeth, mouth full.', 1, 'গধুৰ “dh”: জিভাৰ আগ দাঁতৰ মাজত, মুখ ভৰাই।'],
+    ['ز', 'যা', 'য', 'z', 'A buzzing “z” as in “zoo”. One dot above.', 0, 'গুণগুণীয়া “য”: দাঁত দুপাৰি ওচৰা-ওচৰি ৰাখি মৌমাখিৰ গুণগুণনিৰ দৰে মাতেৰে উচ্চাৰণ কৰক। ওপৰত এটা ফুট।'],
+    ['س', 'ছীন', 'ছ', 's', 'A thin, clear “s”. Three small teeth.', 1, 'পাতল, স্পষ্ট “ছ” — চিঁ-চিঁ শব্দৰ দৰে। তিনিটা সৰু দাঁত।'],
+    ['ش', 'শ্বীন', 'শ্ব', 'sh', '“sh” as in “ship”. Three dots above.', 1, '“শ্ব” — কাকো মনে মনে থাকিবলৈ কওঁতে কোৱা “শ্‌-শ্‌”-ৰ দৰে। ওপৰত তিনিটা ফুট।'],
+    ['ص', 'ছাদ', 'ছ', 'ṣ', 'A heavy “s”: raise the back of the tongue and fill the mouth.', 1, 'গধুৰ “ছ”: জিভাৰ পিছভাগ ওপৰলৈ তুলি মুখ ভৰাই উচ্চাৰণ কৰক।'],
+    ['ض', 'দ্বাদ', 'দ্ব', 'ḍ', 'A heavy “d” made with the side of the tongue against the upper back teeth.', 1, 'গধুৰ “দ”: জিভাৰ কাষ ওপৰৰ পিছফালৰ দাঁতত লগাই উচ্চাৰণ কৰক।'],
+    ['ط', 'ত্বা', 'ত্ব', 'ṭ', 'A heavy, full-mouth “t”.', 1, 'গধুৰ, মুখ ভৰা “ত”।'],
+    ['ظ', 'যা', 'য', 'ẓ', 'A heavy “dh”: tongue tip between the teeth, mouth full.', 1, 'গধুৰ “য”: জিভাৰ আগ দাঁতৰ মাজত ৰাখি মুখ ভৰাই উচ্চাৰণ কৰক।'],
     ['ع', 'আঈন', '‘আ', 'ʿ', 'A squeezed sound from the middle of the throat. Listen to the example and copy it.', 1, 'ডিঙিৰ মাজভাগৰ পৰা চেপি উলিওৱা ধ্বনি। উদাহৰণটো শুনক আৰু অনুকৰণ কৰক।'],
     ['غ', 'গাঈন', 'গ', 'gh', 'Like a soft gargle from the top of the throat. One dot above.', 1, 'ডিঙিৰ ওপৰভাগৰ পৰা কুলকুলি কৰাৰ দৰে কোমল ধ্বনি। ওপৰত এটা ফুট।'],
-    ['ف', 'ফা', 'ফ', 'f', '“f”: upper teeth touch the lower lip (not two lips like Assamese ফ). One dot above.', 1, '“f”: ওপৰৰ দাঁতে তলৰ ওঁঠ স্পৰ্শ কৰে (অসমীয়া ফ-ৰ দৰে দুটা ওঁঠেৰে নহয়)। ওপৰত এটা ফুট।'],
-    ['ق', 'ক্বাফ', 'ক্ব', 'q', 'A deep “k” from the very back of the tongue. Two dots above.', 1, 'জিভাৰ একেবাৰে পিছভাগৰ পৰা ওলোৱা গভীৰ “k”। ওপৰত দুটা ফুট।'],
+    ['ف', 'ফা', 'ফ', 'f', '“f”: upper teeth touch the lower lip (not two lips like Assamese ফ). One dot above.', 1, '“ফ”: ওপৰৰ দাঁতে তলৰ ওঁঠ স্পৰ্শ কৰে (অসমীয়া ফ-ৰ দৰে দুয়োটা ওঁঠেৰে নহয়)। ওপৰত এটা ফুট।'],
+    ['ق', 'ক্বাফ', 'ক্ব', 'q', 'A deep “k” from the very back of the tongue. Two dots above.', 1, 'জিভাৰ একেবাৰে পিছভাগৰ পৰা ওলোৱা গভীৰ “ক”। ওপৰত দুটা ফুট।'],
     ['ك', 'কাফ', 'ক', 'k', 'Like ক.', 1, 'ক-ৰ দৰে।'],
     ['ل', 'লাম', 'ল', 'l', 'Like ল.', 1, 'ল-ৰ দৰে।'],
     ['م', 'মীম', 'ম', 'm', 'Like ম.', 1, 'ম-ৰ দৰে।'],
@@ -44,7 +44,7 @@
     ['Long ī', 'দীঘল ঈ', (c) => c + 'ِي', 'Kasra followed by ya ي — stretch the “i” for two counts.', 'যেৰৰ পিছত ইয়া ي — “ই” ধ্বনি দুই মাত্ৰা টানক।'],
     ['Long ū', 'দীঘল ঊ', (c) => c + 'ُو', 'Damma followed by waw و — stretch the “u” for two counts.', 'পেশৰ পিছত ৱাও و — “উ” ধ্বনি দুই মাত্ৰা টানক।'],
     ['Sukun', 'জযম (ছুকূন)', (c) => 'أَ' + c + 'ْ', 'A small circle: the letter has no vowel. It closes the sound before it (shown here after أَ).', 'এটা সৰু ঘূৰণীয়া চিন: আখৰটোত কোনো স্বৰধ্বনি নাই। ই আগৰ ধ্বনিটো বন্ধ কৰে (ইয়াত أَ-ৰ পিছত দেখুওৱা হৈছে)।'],
-    ['Shadda', 'তাশদীদ', (c) => 'أَ' + c + 'َّ', 'A small “w” shape: the letter is said twice — once closing, once opening (shown here after أَ).', 'সৰু “w”-ৰ দৰে চিন: আখৰটো দুবাৰ উচ্চাৰণ কৰা হয় — এবাৰ বন্ধ কৰি, এবাৰ খুলি (ইয়াত أَ-ৰ পিছত দেখুওৱা হৈছে)।'],
+    ['Shadda', 'তাশদীদ', (c) => 'أَ' + c + 'َّ', 'A small “w” shape: the letter is said twice — once closing, once opening (shown here after أَ).', 'তিনিটা সৰু দাঁতৰ দৰে চিন: আখৰটো দুবাৰ উচ্চাৰণ কৰা হয় — এবাৰ বন্ধ কৰি, এবাৰ খুলি (ইয়াত أَ-ৰ পিছত দেখুওৱা হৈছে)।'],
     ['Tanwin -an', 'দুই যবৰ', (c) => c + 'ًا', 'Two fathas: add an “n” sound — “an”. The alif after it is not read.', 'দুটা যবৰ: শেষত “ন” ধ্বনি যোগ হয় — “আন”। পিছৰ আলিফ পঢ়া নহয়।'],
     ['Tanwin -in', 'দুই যেৰ', (c) => c + 'ٍ', 'Two kasras: “in”.', 'দুটা যেৰ: “ইন”।'],
     ['Tanwin -un', 'দুই পেশ', (c) => c + 'ٌ', 'Two dammas: “un”.', 'দুটা পেশ: “উন”।']
@@ -91,12 +91,13 @@
     const { h, $, $$, sayWord, shuffle, openModal, closeModal, burst, store, touchDay } = window.Noor;
     const D = window.LESSON_DATA, P = window.AsPron;
     const AS = window.Noor.lang() === 'as';
-    const L = (en, as) => (AS ? as : en);
+    const num = window.Noor.num;
+    const L = (en, as) => (AS ? num(as) : en);
     const meaning = (w) => AS ? (TR_AS[w.tr] || MEAN_AS[clean(w.m).toLowerCase()] || clean(w.m)) : clean(w.m);
     const wordCard = (w, opts = {}) => h('button', { class: 'wcard', onclick: () => sayWord(w), title: L('Tap to hear', 'শুনিবলৈ টিপক') },
       h('span', { class: 'ar', dir: 'rtl', lang: 'ar' }, w.t),
       h('span', { class: 'pa', lang: 'as' }, opts.stop ? P.word(w.t) + ' → ' + P.verse([w.t]) : P.word(w.t)),
-      h('span', { class: 'mn' }, opts.note || meaning(w)), h('span', { class: 'spk' }, '🔊 ' + w.k));
+      h('span', { class: 'mn' }, opts.note || meaning(w)), h('span', { class: 'spk' }, '🔊 ' + num(w.k)));
     const body = h('div', { class: 'lbody' });
 
     /* 1. letters */
@@ -109,7 +110,7 @@
         detail.replaceChildren(
           h('div', { class: 'lbig', lang: 'ar' }, c),
           h('div', { class: 'linfo' },
-            h('h3', {}, name, h('small', {}, L(' · sounds like ', ' · ধ্বনি ')), h('b', { class: 'snd' }, snd), h('small', {}, ' (' + lat + ')')),
+            h('h3', {}, name, h('small', {}, L(' · sounds like ', ' · ধ্বনি ')), h('b', { class: 'snd' }, snd), AS ? null : h('small', {}, ' (' + lat + ')')),
             h('p', {}, L(tipEn, tipAs)),
             h('div', { class: 'forms' }, [L('Alone', 'অকলে'), L('Start', 'আৰম্ভণি'), L('Middle', 'মাজত'), L('End', 'শেষত')].map((lab, i) => h('div', {}, h('span', { class: 'ar', lang: 'ar' }, f[i]), h('small', {}, lab)))),
             j ? null : h('p', { class: 'muted' }, L('This letter never joins to the letter after it, so its “start” and “middle” shapes look like “alone” and “end”.', 'এই আখৰ পিছৰ আখৰৰ লগত কেতিয়াও জোৰা নালাগে; সেয়ে ইয়াৰ “আৰম্ভণি” আৰু “মাজত” ৰূপ “অকলে” আৰু “শেষত”-ৰ দৰেই।')),
@@ -133,7 +134,7 @@
       const draw = () => {
         const t = MARKS[m][2](c);
         out.replaceChildren(h('div', { class: 'lbig', lang: 'ar' }, t), h('div', { class: 'eq' }, '='), h('div', { class: 'sndbig', lang: 'as' }, P.word(t)),
-          h('p', {}, h('b', {}, L(MARKS[m][0] + ' (' + MARKS[m][1] + '): ', MARKS[m][1] + ' (' + MARKS[m][0] + '): ')), L(MARKS[m][3], MARKS[m][4])));
+          h('p', {}, h('b', {}, L(MARKS[m][0] + ' (' + MARKS[m][1] + '): ', MARKS[m][1] + ': ')), L(MARKS[m][3], MARKS[m][4])));
         out.classList.remove('pop'); void out.offsetWidth; out.classList.add('pop');
         $$('.pickL', body).forEach(b => b.classList.toggle('on', b.dataset.c === c));
         $$('.pickM', body).forEach(b => b.classList.toggle('on', +b.dataset.m === m));
@@ -172,7 +173,7 @@
       h('p', { class: 'lead' }, L('These few rules cover most of what you meet on every page. Each example is a real word from the Quran — tap it to hear it.',
         'এই কেইটামান নিয়মেই প্ৰতিটো পৃষ্ঠাত পোৱা প্ৰায় সকলো কথা সামৰি লয়। প্ৰতিটো উদাহৰণ কোৰআনৰ প্ৰকৃত শব্দ — শুনিবলৈ তাত টিপক।')),
       h('div', { class: 'rules' }, RULES.map(([title, text, keys, stop, titleAs, textAs], i) => h('div', { class: 'rule', style: `animation-delay:${i * 60}ms` },
-        h('i', {}, i + 1), h('h3', {}, L(title, titleAs)), h('p', {}, L(text, textAs)),
+        h('i', {}, num(i + 1)), h('h3', {}, L(title, titleAs)), h('p', {}, L(text, textAs)),
         h('div', { class: 'row left' }, keys.map(k => D.byKey[k]).filter(Boolean).map(w => wordCard(w, { stop })))))));
 
     /* 5. word building */
@@ -196,7 +197,7 @@
     const tabCommon = () => body.replaceChildren(
       h('p', { class: 'lead' }, L('These are the words that appear most often in Surah Al-Fatihah and the short surahs of the last part of the Quran. Learn these and you already recognise a large share of what you recite in salah.',
         'ছুৰা ফাতিহা আৰু কোৰআনৰ শেষ অংশৰ চুটি ছুৰাবোৰত এই শব্দবোৰ আটাইতকৈ বেছিকৈ আহে। এইবোৰ শিকিলে আপুনি ছালাতত পঢ়া কথাৰ এটা ডাঙৰ অংশ চিনি পাব।')),
-      h('div', { class: 'row left' }, D.common.map(w => wordCard(w, { note: meaning(w) + ' · ' + w.n + L('×', ' বাৰ') }))));
+      h('div', { class: 'row left' }, D.common.map(w => wordCard(w, { note: meaning(w) + ' · ' + num(w.n) + L('×', ' বাৰ') }))));
 
     /* 7. practice */
     const quiz = () => {
@@ -204,7 +205,7 @@
       const next = () => {
         if (i >= qs.length) {
           touchDay(); store.set('letterQuiz', Math.max(store.get('letterQuiz', 0), score));
-          const sheet = openModal(h('h2', {}, score >= 8 ? L('MashaAllah — well done!', 'মাশ্বাআল্লাহ — বৰ ভাল!') : L('Good effort', 'ভাল চেষ্টা')), h('div', { class: 'big' }, score + '/10'),
+          const sheet = openModal(h('h2', {}, score >= 8 ? L('MashaAllah — well done!', 'মাশ্বাআল্লাহ — বৰ ভাল!') : L('Good effort', 'ভাল চেষ্টা')), h('div', { class: 'big' }, num(score + '/10')),
             h('p', { class: 'muted', style: 'text-align:center' }, L('Repeat this a few times a day until every letter is instant. Then your eyes stop hesitating and your recitation speeds up.',
               'প্ৰতিটো আখৰ দেখামাত্ৰে চিনি নোপোৱালৈকে দিনে কেইবাবাৰো এইটো কৰক। তেতিয়া চকু ৰৈ নাযায় আৰু তিলাৱত খৰ হয়।')),
             h('div', { class: 'row' }, h('button', { class: 'btn gold', onclick: quiz }, L('Again', 'আকৌ')), h('button', { class: 'btn', onclick: closeModal }, L('Close', 'বন্ধ কৰক'))));
@@ -219,7 +220,7 @@
             $$('.opt', box).forEach(b => { b.disabled = true; if (b.dataset.c === q[0]) b.classList.add('right'); });
             if (o[0] === q[0]) { score++; setTimeout(() => { i++; next(); }, 700); } else { e.currentTarget.classList.add('wrong'); nextBtn.hidden = false; }
           }
-        }, o[1] + ' (' + o[3] + ')')));
+        }, o[1] + ' (' + (AS ? o[2] : o[3]) + ')')));
         const sheet = openModal(h('h2', {}, L('Which letter is this?', 'এইটো কোন আখৰ?')), h('div', { class: 'muted' }, L(`Letter ${i + 1} of 10`, `আখৰ ${i + 1} / 10`)),
           h('div', { class: 'qprog' }, h('i', { style: `width:${i * 10}%` })), h('div', { class: 'qword', lang: 'ar' }, shape), box, h('div', { class: 'row' }, nextBtn));
       };
@@ -228,14 +229,14 @@
     const tabPractice = () => body.replaceChildren(
       h('p', { class: 'lead' }, L('Fast recitation starts with instant letter recognition. In this drill a letter appears in one of its four shapes and you choose its name.',
         'খৰকৈ তিলাৱত কৰিবলৈ প্ৰথমে আখৰ দেখামাত্ৰে চিনি পাব লাগিব। এই অনুশীলনত এটা আখৰ তাৰ চাৰিটা ৰূপৰ এটাত দেখা যাব আৰু আপুনি তাৰ নাম বাছিব।')),
-      h('div', { class: 'endcard' }, h('h3', {}, L('Letter recognition drill', 'আখৰ চিনাৰ অনুশীলন')), h('p', {}, L('Ten letters. Your best score so far: ', 'দহটা আখৰ। এতিয়ালৈকে আপোনাৰ সৰ্বোচ্চ নম্বৰ: ') + store.get('letterQuiz', 0) + '/10'),
+      h('div', { class: 'endcard' }, h('h3', {}, L('Letter recognition drill', 'আখৰ চিনাৰ অনুশীলন')), h('p', {}, L('Ten letters. Your best score so far: ', 'দহটা আখৰ। এতিয়ালৈকে আপোনাৰ সৰ্বোচ্চ নম্বৰ: ') + num(store.get('letterQuiz', 0) + '/10')),
         h('div', { class: 'row' }, h('button', { class: 'btn gold', onclick: quiz }, L('Start the drill', 'অনুশীলন আৰম্ভ কৰক')))),
       h('div', { class: 'endcard' }, h('h3', {}, L('Then read real verses', 'তাৰ পিছত প্ৰকৃত আয়াত পঢ়ক')), h('p', {}, L('Open a short surah, hide the pronunciation lines, and try to read each word before you tap it to check.',
         'এটা চুটি ছুৰা খোলক, উচ্চাৰণৰ শাৰীবোৰ লুকুৱাই ৰাখক, আৰু প্ৰতিটো শব্দত টিপি পৰীক্ষা কৰাৰ আগতে নিজে পঢ়িবলৈ চেষ্টা কৰক।')),
         h('div', { class: 'row' }, h('a', { class: 'btn', href: '#/s/112' }, L('Practise on Al-Ikhlas →', 'ছুৰা ইখলাছত অনুশীলন কৰক →')))));
 
     const TABS = [['Letters', 'আখৰ', tabLetters], ['Vowel marks', 'স্বৰচিন', tabMarks], ['Joining', 'জোৰা লগোৱা', tabJoin], ['Reading rules', 'পঢ়াৰ নিয়ম', tabRules], ['Word building', 'শব্দ গঠন', tabBuild], ['Common words', 'সঘন শব্দ', tabCommon], ['Practice', 'অনুশীলন', tabPractice]];
-    const tabs = h('div', { class: 'ltabs' }, TABS.map(([en, as, fn], i) => h('button', { class: 'chip ltab', onclick: (e) => { $$('.ltab', tabs).forEach(b => b.classList.remove('on')); e.currentTarget.classList.add('on'); store.set('learnTab', i); fn(); body.classList.remove('fadein'); void body.offsetWidth; body.classList.add('fadein'); } }, (i + 1) + '. ' + L(en, as))));
+    const tabs = h('div', { class: 'ltabs' }, TABS.map(([en, as, fn], i) => h('button', { class: 'chip ltab', onclick: (e) => { $$('.ltab', tabs).forEach(b => b.classList.remove('on')); e.currentTarget.classList.add('on'); store.set('learnTab', i); fn(); body.classList.remove('fadein'); void body.offsetWidth; body.classList.add('fadein'); } }, num(i + 1) + '. ' + L(en, as))));
     app.replaceChildren(
       h('section', { class: 'shead' }, h('div', { class: 'shead-art', html: Scenes.forSurah(96) }), h('div', { class: 'shead-in' },
         h('div', { class: 'shead-txt' }, h('div', { class: 'sub' }, L('Chapter 1 · for beginners', 'অধ্যায় 1 · নতুন শিকাৰুৰ বাবে')), h('h1', {}, L('Learn to read Arabic', 'আৰবী পঢ়িবলৈ শিকক')),

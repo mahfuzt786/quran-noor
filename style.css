@@ -253,7 +253,7 @@ html[lang="as"] .tlabel { text-transform: none; letter-spacing: 0; font-size: 13
 .w .ar { font: var(--ar-size)/2.25 var(--quran); color: var(--ar); transition: color .15s, text-shadow .15s; }
 /* text under each Arabic word: same size as the Pronunciation / Meaning lines, and grows with A+ / A− */
 .w .pa { font: 600 calc(var(--ar-size) * .56)/1.35 var(--bn); color: var(--gold); direction: ltr; margin-top: 4px; }
-.w .tr { font-size: calc(var(--ar-size) * .44); color: var(--teal); font-style: italic; direction: ltr; line-height: 1.4; }
+.w .tr { font-size: calc(var(--ar-size) * .5); color: var(--teal); font-style: italic; direction: ltr; line-height: 1.4; }
 .w .mn { font: 500 calc(var(--ar-size) * .5)/1.35 var(--ui); color: var(--text); opacity: .82; direction: ltr; text-align: center; max-width: 220px; margin-top: 2px; }
 .w .mn:lang(bn) { font-family: var(--bn); }
 .w.done .ar { color: var(--teal); }
@@ -307,7 +307,7 @@ html[lang="en"] .lbl { font-family: Figtree, sans-serif; text-transform: upperca
 .tip { position: absolute; z-index: 50; width: 240px; background: var(--card2); border: 1px solid var(--gold); border-radius: 18px; padding: 12px 16px 14px; box-shadow: var(--shadow-lg); text-align: center; animation: pop .18s both; }
 .tip .ar { font: 40px/1.9 var(--quran); color: var(--gold); }
 .tip .pa { font: 700 19px var(--bn); color: var(--text); }
-.tip .tr { color: var(--teal); font-style: italic; font-size: 14px; }
+.tip .tr { color: var(--teal); font-style: italic; font-size: 16px; }
 .tip .mn { font-weight: 700; margin: 2px 0 10px; }
 .tip small { color: var(--muted); display: block; margin-top: 8px; font-size: 12.5px; }
 

@@ -458,7 +458,7 @@
         h('section', { class: 'sec' },
           h('div', { class: 'sec-title' }, h('h2', {}, t('how_title')), h('span', {}, t('how_sub'))),
           h('div', { class: 'method' }, [['ear', 'how1'], ['echo', 'how2'], ['fast', 'how3'], ['heart', 'how4']]
-            .map(([ic, k], i) => h('div', { class: 'step' }, h('i', {}, i + 1), h('div', { class: 'step-ic', html: icon[ic] }), h('h3', {}, t(k + '_t')), h('p', {}, t(k + '_d')))))),
+            .map(([ic, k], i) => h('div', { class: 'step' }, h('i', {}, num(i + 1)), h('div', { class: 'step-ic', html: icon[ic] }), h('h3', {}, t(k + '_t')), h('p', {}, t(k + '_d')))))),
         h('a', { class: 'banner', href: '#/learn' },
           h('div', { class: 'bl', dir: 'rtl', lang: 'ar', 'aria-hidden': 'true' }, ['ا', 'ب', 'ت', 'ث', 'ج'].map((c, i) => h('span', { style: `animation-delay:${i * 0.25}s` }, c))),
           h('div', { class: 'bl-txt' }, h('h3', {}, t('banner_t')), h('p', {}, t('banner_d'))),
@@ -604,7 +604,7 @@
     }
     if (m) return viewSurah(Math.min(114, Math.max(1, +m[1])));
     stopAll(); stopTimer(false); S.cur = null; S.token++;
-    if (location.hash.startsWith('#/learn')) { document.title = t('nav_learn') + ' · Noor'; $('#player').hidden = true; window.Learn.view($('#app')); window.scrollTo(0, 0); return; }
+    if (location.hash.startsWith('#/learn')) { document.title = t('nav_learn') + (S.lang === 'as' ? ' · নূৰ' : ' · Noor'); $('#player').hidden = true; window.Learn.view($('#app')); window.scrollTo(0, 0); return; }
     viewHome();
     window.scrollTo(0, 0);
   }
@@ -616,7 +616,7 @@
     const keep = scrollY;
     route().then(() => window.scrollTo(0, keep));
   });
-  window.Noor = { h, $, $$, sayWord, shuffle, openModal, closeModal, burst, store, touchDay, t, lang: () => S.lang, footer };
+  window.Noor = { h, $, $$, sayWord, shuffle, openModal, closeModal, burst, store, touchDay, t, num, lang: () => S.lang, footer };
   applyTheme(); bindPlayer();
   window.addEventListener('hashchange', route);
   route();
