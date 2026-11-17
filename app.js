@@ -98,8 +98,14 @@
   function t(key, arg) {
     const e = I[key]; if (!e) return key;
     const v = e[S.lang === 'as' ? 1 : 0];
-    return typeof v === 'function' ? v(arg) : v;
+    const out = typeof v === 'function' ? v(arg) : v;
+    return S.lang === 'as' ? num(out) : out;
   }
+  const AS_DIGITS = '০১২৩৪৫৬৭৮৯';
+  // Assamese numerals in Assamese mode (০১২৩…), Western digits in English mode
+  function num(x) { const str = String(x); return S.lang === 'as' ? str.replace(/[0-9]/g, d => AS_DIGITS[d]) : str; }
+  const sname = (c) => (S.lang === 'as' && c.asName) || c.name;
+  const smean = (c) => (S.lang === 'as' && c.asMean) || c.mean;
   const AS = () => S.lang === 'as';
 
   function applyTheme() {
@@ -113,7 +119,7 @@
     $('#navLearn .nl').textContent = t('nav_learn'); $('#navSurahs .nl').textContent = t('nav_surahs');
     $$('#langSwitch button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === S.lang)));
     $('#langSwitch').setAttribute('aria-label', t('lang_label'));
-    $('#timerStop').textContent = t('stop');
+    $('#timerStop').textContent = t('stop'); $('.skip').textContent = t('skip');
     $('#pPrev').setAttribute('aria-label', t('pl_prev')); $('#pPrev').title = t('pl_prev');
     $('#pNext').setAttribute('aria-label', t('pl_next')); $('#pNext').title = t('pl_next');
     $('#pPlay').setAttribute('aria-label', t('pl_play'));
@@ -126,7 +132,8 @@
   /* ---------- data ---------- */
   // data/chapters.json: [[id, name, arabic, meaning, verses, makkah(1/0), bismillah(1/0)], ...]
   const loadChapters = () => getJSON(`${DATA}chapters.json?v=${DATA_V}`, 'chapters', d => d.map(c => ({
-    id: c[0], name: c[1], ar: c[2], mean: c[3], n: c[4], place: c[5] ? 'makkah' : 'madinah', bism: !!c[6]
+    id: c[0], name: c[1], ar: c[2], mean: c[3], n: c[4], place: c[5] ? 'makkah' : 'madinah', bism: !!c[6],
+    asName: (window.SURAH_NAMES_AS || [])[c[0] - 1]?.[0], asMean: (window.SURAH_NAMES_AS || [])[c[0] - 1]?.[1]
   })));
   // data/s/<id>.json: { v: [[n, assamese, english, [[uthmani, translit, meaning_en, meaning_bn], ...], endMark], ...],
   //                     a: [audioUrl, [[fromMs, toMs, [[wordPos, startMs, endMs], ...]], ...]] }
@@ -153,7 +160,7 @@
     el.classList.add('active');
     if (scroll) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
     const c = S.cur;
-    $('#pTitle').textContent = t('pl_title', [c.meta.name, i + 1, c.meta.n]);
+    $('#pTitle').textContent = t('pl_title', [sname(c.meta), i + 1, c.meta.n]);
     S.last = { id: c.meta.id, v: i }; store.set('last', S.last);
     if ('mediaSession' in navigator) try { navigator.mediaSession.metadata = new MediaMetadata({ title: `${c.meta.name} ${c.meta.id}:${i + 1}`, artist: 'Mishari Rashid al-Afasy', album: 'Noor' }); } catch { /* ignore */ }
   }
@@ -166,7 +173,7 @@
   function clearWait() { if (P.wait) { clearTimeout(P.wait); P.wait = null; } $('.pbar').classList.remove('turn'); $$('.verse.turn').forEach(e => e.classList.remove('turn')); }
   function playerUI() {
     const b = $('#pPlay'); b.classList.toggle('playing', P.playing); b.dataset.state = P.playing ? 'pause' : 'play';
-    $('#spVal').textContent = fmtRate(P.rate);
+    $('#spVal').textContent = num(fmtRate(P.rate));
     $('#pRepeat').textContent = t('repeat', P.repeat ? P.repeat + '×' : '∞'); $('#pRepeat').classList.toggle('on', P.repeat !== 1);
     $('#pEcho').textContent = t('echo'); $('#pSolo').textContent = t('solo');
     $('#pEcho').classList.toggle('on', P.echo); $('#pSolo').classList.toggle('on', P.solo);
@@ -328,7 +335,7 @@
         }
       }, o)));
       openModal(
-        h('h2', {}, t('q_title')), h('div', { class: 'muted' }, t('q_of', [i + 1, qs.length, c.meta.name])),
+        h('h2', {}, t('q_title')), h('div', { class: 'muted' }, t('q_of', [i + 1, qs.length, sname(c.meta)])),
         h('div', { class: 'qprog' }, h('i', { style: `width:${i / qs.length * 100}%` })),
         h('div', { class: 'qword', dir: 'rtl', lang: 'ar' }, q.t), tr, box,
         h('div', { class: 'row' }, h('button', { class: 'btn sm', onclick: () => sayWord(q) }, '🔊 ' + t('hear')), nextBtn)
@@ -339,7 +346,7 @@
       const p = progOf(c.meta.id); p.quiz = Math.max(p.quiz || 0, Math.round(score / qs.length * 100)); saveProg(); touchDay();
       const sheet = openModal(
         h('h2', {}, t(score === qs.length ? 'q_perfect' : score >= qs.length * 0.7 ? 'q_good' : 'q_try')),
-        h('div', { class: 'big' }, `${score}/${qs.length}`),
+        h('div', { class: 'big' }, num(`${score}/${qs.length}`)),
         h('p', { class: 'muted center' }, t('q_known', Object.keys(S.known).length)),
         h('div', { class: 'row' }, h('button', { class: 'btn gold', onclick: startQuiz }, t('q_again')), h('button', { class: 'btn', onclick: closeModal }, t('q_back')))
       );
@@ -355,12 +362,12 @@
     pause();
     openModal(
       h('h2', {}, t('tm_title')),
-      h('p', { class: 'muted' }, t('tm_desc', c.meta.name)),
+      h('p', { class: 'muted' }, t('tm_desc', sname(c.meta))),
       h('div', { class: 'row' }, h('button', {
         class: 'btn gold', onclick: () => {
           closeModal(); window.scrollTo({ top: $('#verses').getBoundingClientRect().top + scrollY - 130, behavior: 'smooth' });
           T.t0 = performance.now(); $('#timerPill').hidden = false;
-          T.int = setInterval(() => ($('#timerText').textContent = fmtTime(performance.now() - T.t0)), 100);
+          T.int = setInterval(() => ($('#timerText').textContent = num(fmtTime(performance.now() - T.t0))), 100);
         }
       }, t('tm_start')))
     );
@@ -376,10 +383,10 @@
     if (ms < 1500 || wpm > 400) return toast(t('tm_quick'));
     const p = progOf(c.meta.id); p.wpm = (p.wpm || []).concat({ d: Date.now(), wpm }).slice(-30); saveProg(); touchDay();
     const hist = p.wpm.map(x => x.wpm), first = hist[0], best = Math.max(...hist), max = Math.max(best, recWpm, wpm) || 1;
-    const bar = (cls, label, val) => h('div', { class: 'bar ' + cls }, h('span', {}, label), h('div', {}, h('i', { 'data-w': val / max * 100 })), h('b', {}, val + ' ' + t('wpm')));
+    const bar = (cls, label, val) => h('div', { class: 'bar ' + cls }, h('span', {}, label), h('div', {}, h('i', { 'data-w': val / max * 100 })), h('b', {}, num(val) + ' ' + t('wpm')));
     const msg = wpm >= recWpm && recWpm ? t('tm_at') : hist.length > 1 && wpm > first ? t('tm_faster', Math.round((wpm / first - 1) * 100)) : t('tm_startpt');
     const sheet = openModal(
-      h('h2', {}, t('tm_pace')), h('div', { class: 'big' }, wpm), h('div', { class: 'muted center' }, t('tm_wpm', [words, fmtTime(ms)])),
+      h('h2', {}, t('tm_pace')), h('div', { class: 'big' }, num(wpm)), h('div', { class: 'muted center' }, t('tm_wpm', [words, fmtTime(ms)])),
       h('div', { class: 'bars' }, bar('you', t('tm_this'), wpm), hist.length > 1 ? bar('', t('tm_first'), first) : null, recWpm ? bar('', t('tm_rec'), recWpm) : null),
       hist.length > 1 ? h('div', { html: spark(hist) }) : null,
       h('p', { class: 'muted' }, msg),
@@ -419,9 +426,9 @@
     const hasProgress = practiced || known || S.streak.n;
 
     let filter = 'all', query = '';
-    const card = (c) => h('a', { class: 'sura' + (isDone(c.id) ? ' done' : ''), href: '#/s/' + c.id, 'data-q': (c.name + ' ' + c.mean + ' ' + c.id + ' ' + c.ar).toLowerCase(), 'data-place': c.place, 'data-n': c.n },
-      h('span', { class: 'badge' }, c.id),
-      h('span', { class: 'mid' }, h('b', {}, c.name), h('span', { class: 'mean' }, c.mean), h('span', { class: 'meta' }, t('verses', c.n) + ' · ' + placeName(c.place))),
+    const card = (c) => h('a', { class: 'sura' + (isDone(c.id) ? ' done' : ''), href: '#/s/' + c.id, 'data-q': [c.name, c.mean, c.id, num(c.id), c.ar, c.asName, c.asMean].join(' ').toLowerCase(), 'data-place': c.place, 'data-n': c.n },
+      h('span', { class: 'badge' }, num(c.id)),
+      h('span', { class: 'mid' }, h('b', {}, sname(c)), h('span', { class: 'mean' }, smean(c)), h('span', { class: 'meta' }, t('verses', c.n) + ' · ' + placeName(c.place))),
       h('span', { class: 'arn', lang: 'ar' }, c.ar));
     const grid = h('div', { class: 'grid' }, ch.map(card));
     const empty = h('p', { class: 'muted center', hidden: true }, t('no_match'));
@@ -441,13 +448,13 @@
         h('h1', {}, t('hero_h1')),
         h('p', {}, t('hero_p')),
         h('div', { class: 'cta' },
-          h('a', { class: 'btn gold lg', href: '#/s/' + (last ? last.id : 1) }, last ? t('cta_continue', last.name) : t('cta_start')),
+          h('a', { class: 'btn gold lg', href: '#/s/' + (last ? last.id : 1) }, last ? t('cta_continue', sname(last)) : t('cta_start')),
           h('a', { class: 'btn glass', href: '#/learn' }, t('cta_learn')),
           h('button', { class: 'btn glass', onclick: () => $('#all').scrollIntoView({ behavior: 'smooth' }) }, t('cta_all'))))),
       h('div', { class: 'wrap' },
         hasProgress ? h('div', { class: 'stats' },
           [[S.streak.n || 0, t('st_streak')], [known, t('st_words')], [practiced, t('st_surahs')], [best || '—', t('st_pace')]]
-            .map(([b, s], i) => h('div', { class: 'stat', style: `animation-delay:${i * 80}ms` }, h('b', {}, b), h('span', {}, s)))) : null,
+            .map(([b, s], i) => h('div', { class: 'stat', style: `animation-delay:${i * 80}ms` }, h('b', {}, num(b)), h('span', {}, s)))) : null,
         h('section', { class: 'sec' },
           h('div', { class: 'sec-title' }, h('h2', {}, t('how_title')), h('span', {}, t('how_sub'))),
           h('div', { class: 'method' }, [['ear', 'how1'], ['echo', 'how2'], ['fast', 'how3'], ['heart', 'how4']]
@@ -461,7 +468,7 @@
           h('ol', { class: 'path' }, STARTER.map((id, i) => {
             const c = ch[id - 1];
             return h('li', {}, h('a', { class: 'node' + (isDone(id) ? ' done' : ''), href: '#/s/' + id },
-              h('span', { class: 'n' }, t('step') + ' ' + (i + 1)), h('span', { class: 'a', lang: 'ar' }, c.ar), h('span', { class: 'e' }, c.name), h('span', { class: 'm' }, t('verses', c.n))));
+              h('span', { class: 'n' }, t('step') + ' ' + num(i + 1)), h('span', { class: 'a', lang: 'ar' }, c.ar), h('span', { class: 'e' }, sname(c)), h('span', { class: 'm' }, t('verses', c.n))));
           }))),
         h('section', { class: 'sec', id: 'all' },
           h('div', { class: 'sec-title' }, h('h2', {}, t('all_t')),
@@ -476,7 +483,7 @@
   function renderVerse(v, i) {
     return h('article', { class: 'verse', id: 'v-' + i, style: `animation-delay:${Math.min(i, 8) * 50}ms` },
       h('div', { class: 'vhead' },
-        h('span', { class: 'vnum' }, v.n), h('span', { class: 'vkey' }, v.key),
+        h('span', { class: 'vnum' }, num(v.n)), h('span', { class: 'vkey' }, num(v.key)),
         h('button', { class: 'vplay', title: t('play_from', v.n), 'aria-label': t('play_from', v.n), onclick: () => play(i) },
           h('span', { html: '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>' }))),
       h('div', { class: 'words', dir: 'rtl', lang: 'ar' }, v.w.map(w => w.end
@@ -490,7 +497,7 @@
 
   async function viewSurah(id) {
     const meta = S.chapters[id - 1]; if (!meta) { location.hash = '#/'; return; }
-    document.title = `${meta.name} (${meta.ar}) · Noor`;
+    document.title = `${sname(meta)} (${meta.ar}) · ${S.lang === 'as' ? 'নূৰ' : 'Noor'}`;
     const token = ++S.token;
     stopAll(); stopTimer(false);
     S.cur = { meta, verses: [], ts: null, audioUrl: null };
@@ -501,13 +508,13 @@
 
     const storyEl = sum ? h('section', { class: 'story' },
       h('div', { class: 'sec-title' }, h('h2', {}, t('sum_t')), sum.length > 2 ? h('span', {}, t('sum_parts', sum.length - 1)) : null),
-      h('p', { class: 'lead', lang: useAs ? 'as' : 'en' }, useAs ? sumAs[0] : sum[0]),
+      h('p', { class: 'lead', lang: useAs ? 'as' : 'en' }, useAs ? num(sumAs[0]) : sum[0]),
       h('div', { class: 'scards' }, sum.slice(1).map(([ic, enTitle, enText], i) => {
         const title = useAs ? sumAs[i + 1][0] : enTitle, text = useAs ? sumAs[i + 1][1] : enText;
         const m = text.match(/\((\d+)[^()]*\)[.।]?$/);
         return h('article', { class: 'scard', style: `animation-delay:${i * 90}ms` },
           h('div', { class: 'sart', html: Scenes.icon(ic) }),
-          h('div', { class: 'sbody', lang: useAs ? 'as' : 'en' }, h('h3', {}, title), h('p', {}, text),
+          h('div', { class: 'sbody', lang: useAs ? 'as' : 'en' }, h('h3', {}, title), h('p', {}, useAs ? num(text) : text),
             m && +m[1] <= meta.n ? h('button', { class: 'link', onclick: () => { const el = verseEl(+m[1] - 1); el ? el.scrollIntoView({ block: 'start', behavior: 'smooth' }) : toast(t('v_loading')); } }, t('jump', m[1])) : null));
       }))) : null;
 
@@ -518,13 +525,13 @@
     const size = (d) => { S.set.size = Math.max(24, Math.min(56, S.set.size + d)); saveSet(); applyTheme(); };
     const preset = (n, k, cfg) => h('button', {
       class: 'preset', onclick: (e) => { Object.assign(P, cfg); P.left = P.repeat; play(P.vi < 0 ? resume : P.vi); e.currentTarget.classList.add('on'); }
-    }, h('span', { class: 'pn' }, n), h('span', { class: 'pt' }, h('b', {}, t(k + '_t')), h('span', {}, t(k + '_d'))));
+    }, h('span', { class: 'pn' }, num(n)), h('span', { class: 'pt' }, h('b', {}, t(k + '_t')), h('span', {}, t(k + '_d'))));
 
     app.replaceChildren(
       h('section', { class: 'shead' }, h('div', { class: 'shead-art', html: Scenes.forSurah(id) }), h('div', { class: 'shead-in' },
         h('div', { class: 'shead-txt' },
           h('div', { class: 'sub' }, `${t('surah_n', id)} · ${placeName(meta.place)} · ${t('verses', meta.n)}`),
-          h('h1', {}, meta.name), h('div', { class: 'sub mean' }, meta.mean),
+          h('h1', {}, sname(meta)), h('div', { class: 'sub mean' }, smean(meta)),
           h('div', { class: 'row left shead-act' },
             h('button', { class: 'btn gold', onclick: () => play(resume) }, h('span', { html: '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>' }), resume ? t('continue_v', resume + 1) : t('listen')),
             resume ? h('button', { class: 'btn glass', onclick: () => { const el = verseEl(resume); el ? el.scrollIntoView({ block: 'center', behavior: 'smooth' }) : toast(t('v_loading')); } }, '↓ ' + (resume + 1)) : null)),
@@ -542,21 +549,21 @@
           h('div', { class: 'tgroup' }, h('span', { class: 'tlabel' }, t('show')), tog('showPa', t('t_pa')), tog('showMn', t('t_mn')), tog('showTr', t('t_tr')), tog('showEn', t('t_en'))),
           h('div', { class: 'tgroup' },
             h('span', { class: 'tlabel', title: t('wbw_note') }, t('wbw_lang')),
-            h('div', { class: 'seg' }, ['en', 'bn'].map(l => h('button', { 'aria-pressed': String(S.set.wbw === l), onclick: () => { if (S.set.wbw !== l) { S.set.wbw = l; saveSet(); viewSurah(id); } } }, l === 'en' ? 'English' : 'বাংলা'))),
+            h('div', { class: 'seg' }, ['en', 'bn'].map(l => h('button', { 'aria-pressed': String(S.set.wbw === l), onclick: () => { if (S.set.wbw !== l) { S.set.wbw = l; saveSet(); viewSurah(id); } } }, l === 'en' ? (S.lang === 'as' ? 'ইংৰাজী' : 'English') : 'বাংলা'))),
             h('span', { class: 'tlabel' }, t('size')),
-            h('div', { class: 'seg' }, h('button', { 'aria-label': t('smaller'), onclick: () => size(-3) }, 'A−'), h('button', { 'aria-label': t('larger'), onclick: () => size(3) }, 'A+'))),
-          h('div', { class: 'tgroup end' },
+            h('div', { class: 'seg' }, h('button', { 'aria-label': t('smaller'), onclick: () => size(-3) }, S.lang === 'as' ? 'অ−' : 'A−'), h('button', { 'aria-label': t('larger'), onclick: () => size(3) }, S.lang === 'as' ? 'অ+' : 'A+'))),
+          h('div', { class: 'tgroup tg-end' },
             h('button', { class: 'btn sm', onclick: startTimer }, '⏱ ' + t('time_me')), h('button', { class: 'btn sm gold', onclick: startQuiz }, '✦ ' + t('quiz')))),
         meta.bism ? h('div', { class: 'bism', dir: 'rtl', lang: 'ar' }, BISMILLAH, h('small', { dir: 'ltr', lang: 'as' }, t('bism_as'))) : null,
         verses,
         h('div', { class: 'endcard' }, h('h3', {}, t('end_t')), h('p', {}, t('end_d')),
           h('div', { class: 'row' }, h('button', { class: 'btn gold', onclick: startQuiz }, '✦ ' + t('end_quiz')), h('button', { class: 'btn', onclick: startTimer }, '⏱ ' + t('end_time'))),
           h('nav', { class: 'row pager' },
-            id > 1 ? h('a', { class: 'chip', href: '#/s/' + (id - 1) }, '← ' + S.chapters[id - 2].name) : null,
-            id < 114 ? h('a', { class: 'chip', href: '#/s/' + (id + 1) }, S.chapters[id].name + ' →') : null)),
+            id > 1 ? h('a', { class: 'chip', href: '#/s/' + (id - 1) }, '← ' + sname(S.chapters[id - 2])) : null,
+            id < 114 ? h('a', { class: 'chip', href: '#/s/' + (id + 1) }, sname(S.chapters[id]) + ' →') : null)),
         footer())
     );
-    $('#player').hidden = false; $('#pfill').style.width = '0'; $('#pTitle').textContent = meta.name; playerUI();
+    $('#player').hidden = false; $('#pfill').style.width = '0'; $('#pTitle').textContent = sname(meta); playerUI();
     window.scrollTo(0, 0);
 
     try {

@@ -1,6 +1,7 @@
 /* Interface text in English and Assamese. [english, assamese]; a function receives one argument. */
 window.NOOR_I18N = {
   title: ['Noor — Recite the Quran fluently, understand every word', 'নূৰ — কোৰআন সাৱলীলভাৱে পঢ়ক, প্ৰতিটো শব্দ বুজক'],
+  skip: ['Skip to content', 'মূল বিষয়লৈ যাওক'],
   nav_learn: ['Learn to read', 'পঢ়িবলৈ শিকক'],
   nav_surahs: ['Surahs', 'ছুৰাসমূহ'],
   theme: ['Switch light / dark', 'পোহৰ / আন্ধাৰ সলনি কৰক'],
