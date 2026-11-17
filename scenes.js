@@ -85,15 +85,15 @@
         <g class="float"><circle cx="985" cy="-70" r="80" fill="#f2c66d" opacity=".09"/><circle cx="985" cy="-70" r="40" fill="#f6d998"/><circle cx="1002" cy="-78" r="34" fill="#0b1438"/></g>
         <g opacity=".5">${cloud(180, 0, 2.2, 'drift', 0.12)}${cloud(780, 90, 1.8, 'drift2', 0.1)}</g>
         <path d="M0 360 Q200 300 420 346 T820 330 T1200 350 V420 H0Z" fill="#0e1740"/>
-        <g transform="translate(600 420) scale(.82) translate(-600 -420)">${minaret(372)}${minaret(802)}
-          <path d="M500 304 C500 196 700 196 700 304Z" fill="#0a1230"/><line x1="600" y1="224" x2="600" y2="196" stroke="#f2c66d" stroke-width="2.4"/>
-          <g transform="translate(600 186)"><circle r="9" fill="#f2c66d"/><circle cx="3.5" cy="-2" r="7.5" fill="#17265c"/></g>
-          <path d="M424 304 C424 258 500 258 500 304Z M700 304 C700 258 776 258 776 304Z" fill="#0a1230"/>
-          <rect x="416" y="300" width="368" height="120" fill="#0a1230"/>${win}
-          <path d="M580 420 v-58 a20 20 0 0 1 40 0 v58z" fill="#f6d998" class="lamp"/>
-        </g>
-        <path d="M0 400 Q300 372 600 398 T1200 392 V420 H0Z" fill="#070c26"/>
         ${lantern(110, -40, 0)}${lantern(215, 30, 0.8)}${lantern(1110, 10, 0.4)}
+      </svg>
+      <svg class="hero-mosque" viewBox="340 126 520 294" aria-hidden="true">
+        ${minaret(372)}${minaret(802)}
+        <path d="M500 304 C500 196 700 196 700 304Z" fill="#0a1230"/><line x1="600" y1="224" x2="600" y2="196" stroke="#f2c66d" stroke-width="2.4"/>
+        <g transform="translate(600 186)"><circle r="9" fill="#f2c66d"/><circle cx="3.5" cy="-2" r="7.5" fill="#17265c"/></g>
+        <path d="M424 304 C424 258 500 258 500 304Z M700 304 C700 258 776 258 776 304Z" fill="#0a1230"/>
+        <rect x="416" y="300" width="368" height="120" fill="#0a1230"/>${win}
+        <path d="M580 420 v-58 a20 20 0 0 1 40 0 v58z" fill="#f6d998" class="lamp"/>
       </svg>`;
     }
   };

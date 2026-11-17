@@ -100,10 +100,12 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 /* ============ hero ============ */
 .hero { position: relative; overflow: hidden; color: #eef1fb; min-height: clamp(560px, 80vh, 680px); display: flex; isolation: isolate; }
 .hero-art { position: absolute; inset: 0; z-index: -1; }
-.hero-art svg { width: 100%; height: 100%; display: block; }
+.hero-art .hero-svg { width: 100%; height: 100%; display: block; }
+/* the mosque has its own layer with a fixed height, so it never rises into the text on wide, short screens */
+.hero-art .hero-mosque { position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); height: clamp(150px, 30vh, 240px); width: auto; display: block; }
 .hero::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
   background: radial-gradient(60% 46% at 50% 28%, rgba(5, 8, 24, .55), transparent 70%), linear-gradient(180deg, transparent 75%, var(--bg)); }
-.hero-in { width: 100%; max-width: 860px; margin: 0 auto; padding: clamp(40px, 8vh, 80px) 20px 220px; text-align: center; }
+.hero-in { width: 100%; max-width: 860px; margin: 0 auto; padding: clamp(40px, 8vh, 80px) 20px calc(clamp(150px, 30vh, 240px) + 40px); text-align: center; }
 .salam { font: 600 16px var(--bn); color: #f2c66d; letter-spacing: .4px; animation: rise .7s both; }
 html[lang="en"] .salam { font-family: Figtree, sans-serif; font-style: italic; }
 .hero h1 { font-size: clamp(32px, 5.4vw, 58px); margin: 10px auto 14px; animation: rise .7s .1s both; text-shadow: 0 2px 24px rgba(0, 0, 0, .55); text-wrap: balance; }
@@ -391,7 +393,7 @@ html[lang="en"] .lbl { font-family: Figtree, sans-serif; text-transform: upperca
   .presets { grid-template-columns: 1fr 1fr; }
   .grid { grid-template-columns: 1fr; }
   .banner { flex-direction: column; align-items: flex-start; gap: 10px; }
-  .hero-in { padding-bottom: 190px; }
+  .hero-in { padding-bottom: calc(clamp(150px, 30vh, 240px) + 30px); }
   .hero p { font-size: 16px; }
   .scards { grid-template-columns: 1fr; gap: 10px; }
   .scard { flex-direction: row; }
