@@ -235,7 +235,7 @@
         'এটা চুটি ছুৰা খোলক, উচ্চাৰণৰ শাৰীবোৰ লুকুৱাই ৰাখক, আৰু প্ৰতিটো শব্দত টিপি পৰীক্ষা কৰাৰ আগতে নিজে পঢ়িবলৈ চেষ্টা কৰক।')),
         h('div', { class: 'row' }, h('a', { class: 'btn', href: '#/s/112' }, L('Practise on Al-Ikhlas →', 'ছুৰা ইখলাছত অনুশীলন কৰক →')))));
 
-    const TABS = [['Letters', 'আখৰ', tabLetters], ['Vowel marks', 'স্বৰচিন', tabMarks], ['Joining', 'জোৰা লগোৱা', tabJoin], ['Reading rules', 'পঢ়াৰ নিয়ম', tabRules], ['Word building', 'শব্দ গঠন', tabBuild], ['Common words', 'সঘন শব্দ', tabCommon], ['Practice', 'অনুশীলন', tabPractice]];
+    const TABS = [['Letters', 'আখৰ', tabLetters], ['Vowel marks', 'স্বৰচিন', tabMarks], ['Joining', 'জোৰা লগোৱা', tabJoin], ['Reading rules', 'পঢ়াৰ নিয়ম', tabRules], ['Word building', 'শব্দ গঠন', tabBuild], ['Common words', 'সঘন শব্দ', tabCommon], ['Writing', 'লিখা', () => window.NoorWrite.tab(body, { h, L, num, LET, forms, D, sayWord, store, burst, AS })], ['Practice', 'অনুশীলন', tabPractice]];
     const tabs = h('div', { class: 'ltabs' }, TABS.map(([en, as, fn], i) => h('button', { class: 'chip ltab', onclick: (e) => { $$('.ltab', tabs).forEach(b => b.classList.remove('on')); e.currentTarget.classList.add('on'); store.set('learnTab', i); fn(); body.classList.remove('fadein'); void body.offsetWidth; body.classList.add('fadein'); } }, num(i + 1) + '. ' + L(en, as))));
     app.replaceChildren(
       h('section', { class: 'shead' }, h('div', { class: 'shead-art', html: Scenes.forSurah(96) }), h('div', { class: 'shead-in' },

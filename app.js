@@ -182,7 +182,10 @@
     P.a.playbackRate = P.a.defaultPlaybackRate = P.rate; P.a.muted = P.solo;
     $$('.preset').forEach(p => p.classList.remove('on'));
   }
+  function playOne(vi) { play(vi); P.stopAt = vi; }
   function play(vi) {
+    P.stopAt = null;
+    window.Recite?.stop();
     const c = S.cur;
     if (!c || !c.ts) return toast(t('a_loading'));
     clearWait(); wordAudio.pause();
@@ -216,6 +219,7 @@
     const go = () => {
       clearWait();
       if (!P.playing) return;
+      if (P.stopAt === P.vi) { P.stopAt = null; pause(); return; }
       if (P.repeat === 0 || P.left > 1) {
         if (P.repeat) P.left--;
         P.a.currentTime = v.from / 1000; hiVerse(P.vi, false);
@@ -484,6 +488,8 @@
     return h('article', { class: 'verse', id: 'v-' + i, style: `animation-delay:${Math.min(i, 8) * 50}ms` },
       h('div', { class: 'vhead' },
         h('span', { class: 'vnum' }, num(v.n)), h('span', { class: 'vkey' }, num(v.key)),
+        h('button', { class: 'vmic' + ((store.get('rc', {})[v.key] || 0) === 100 ? ' passed' : ''), title: t('rc_btn'), 'aria-label': t('rc_btn') + ' ' + num(v.n), onclick: () => window.Recite.start(i) },
+          h('span', { html: window.Recite ? window.Recite.icons.mic : '' }), h('span', { class: 'vmic-l' }, t('rc_btn'))),
         h('button', { class: 'vplay', title: t('play_from', v.n), 'aria-label': t('play_from', v.n), onclick: () => play(i) },
           h('span', { html: '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>' }))),
       h('div', { class: 'words', dir: 'rtl', lang: 'ar' }, v.w.map(w => w.end
@@ -534,7 +540,7 @@
           h('h1', {}, sname(meta)), h('div', { class: 'sub mean' }, smean(meta)),
           h('div', { class: 'row left shead-act' },
             h('button', { class: 'btn gold', onclick: () => play(resume) }, h('span', { html: '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>' }), resume ? t('continue_v', resume + 1) : t('listen')),
-            resume ? h('button', { class: 'btn glass', onclick: () => { const el = verseEl(resume); el ? el.scrollIntoView({ block: 'center', behavior: 'smooth' }) : toast(t('v_loading')); } }, '↓ ' + (resume + 1)) : null)),
+            resume ? h('button', { class: 'btn glass', onclick: () => { const el = verseEl(resume); el ? el.scrollIntoView({ block: 'center', behavior: 'smooth' }) : toast(t('v_loading')); } }, '↓ ' + num(resume + 1)) : null)),
         h('div', { class: 'arname', lang: 'ar' }, meta.ar))),
       h('div', { class: 'wrap' },
         storyEl,
@@ -544,7 +550,8 @@
             preset('2', 'p2', { rate: 1, echo: true, solo: false, repeat: 1 }),
             preset('3', 'p3', { rate: 1, echo: false, solo: false, repeat: 1 }),
             preset('4', 'p4', { rate: 1, echo: false, solo: true, repeat: 1 }),
-            preset('5', 'p5', { rate: 1.25, echo: false, solo: true, repeat: 1 }))),
+            preset('5', 'p5', { rate: 1.25, echo: false, solo: true, repeat: 1 }),
+            h('button', { class: 'preset p-test', onclick: () => window.Recite.start(resume) }, h('span', { class: 'pn' }, num(6)), h('span', { class: 'pt' }, h('b', {}, t('p6_t')), h('span', {}, t('p6_d')))))),
         h('div', { class: 'tools' },
           h('div', { class: 'tgroup' }, h('span', { class: 'tlabel' }, t('show')), tog('showPa', t('t_pa')), tog('showMn', t('t_mn')), tog('showTr', t('t_tr')), tog('showEn', t('t_en'))),
           h('div', { class: 'tgroup' },
@@ -594,7 +601,7 @@
     $('#navSurahs').classList.toggle('on', !hsh.startsWith('#/learn'));
   }
   async function route() {
-    closeModal(); $('#tip').hidden = true; navActive();
+    closeModal(); $('#tip').hidden = true; navActive(); window.Recite?.stop();
     const m = location.hash.match(/^#\/s\/(\d+)/);
     try {
       if (!S.chapters) S.chapters = await loadChapters();
@@ -616,7 +623,8 @@
     const keep = scrollY;
     route().then(() => window.scrollTo(0, keep));
   });
-  window.Noor = { h, $, $$, sayWord, shuffle, openModal, closeModal, burst, store, touchDay, t, num, lang: () => S.lang, footer };
+  window.Noor = { h, $, $$, sayWord, shuffle, openModal, closeModal, burst, store, touchDay, t, num, lang: () => S.lang, footer,
+    cur: () => S.cur, verseEl, pause, playOne };
   applyTheme(); bindPlayer();
   window.addEventListener('hashchange', route);
   route();
