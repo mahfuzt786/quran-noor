@@ -210,3 +210,43 @@
 .pg-empty { margin-top: 30px; }
 @media (max-width: 980px) { .pg-stats { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 760px) { .pg-stats { grid-template-columns: repeat(2, 1fr); margin-top: 18px; } .pg-letters { grid-template-columns: repeat(auto-fill, minmax(54px, 1fr)); } }
+
+/* ============ daily goals ============ */
+.gl-card { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px 20px; box-shadow: var(--shadow); }
+.gl-card.met { border-color: var(--ok); box-shadow: 0 0 0 1px var(--ok), var(--shadow); }
+.gl-home { margin-top: -60px; position: relative; z-index: 2; margin-bottom: 14px; }
+.gl-ringwrap { position: relative; flex: none; display: grid; place-items: center; }
+.gl-ring { display: block; }
+.gl-track { fill: none; stroke: var(--line); stroke-width: 8; }
+.gl-fill { fill: none; stroke: var(--gold); stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset .6s ease; }
+.met .gl-fill { stroke: var(--ok); }
+.gl-pct { position: absolute; font: 22px Marcellus, serif; color: var(--text); }
+.gl-body { flex: 1; min-width: 220px; }
+.gl-body h3 { font-size: 19px; margin-bottom: 6px; }
+.gl-lines { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; font-size: 14.5px; }
+.gl-lines li { display: flex; align-items: center; gap: 8px; }
+.gl-lines li b { margin-left: auto; font-weight: 700; }
+.gl-lines li.ok { color: var(--ok); }
+.gl-ic { width: 18px; text-align: center; font-weight: 900; }
+.gl-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.gl-sec { margin-top: 26px; }
+.gl-grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+.gl-grid > .gl-card { flex-direction: column; align-items: stretch; }
+.gl-grid > .gl-card .gl-ringwrap { align-self: center; }
+.gl-week { display: flex; justify-content: space-between; gap: 6px; margin-top: 4px; }
+.gl-day { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; }
+.gl-day i { font-style: normal; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; border: 1.5px dashed var(--line2); font-size: 12px; font-weight: 800; color: var(--muted); }
+.gl-day.part i { border: 1.5px solid var(--warn); color: var(--text); }
+.gl-day.met i { border: 0; background: var(--ok); color: #06231d; font-size: 15px; }
+.gl-day small { font-size: 11px; color: var(--muted); }
+.gl-edit, .gl-rem { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px 18px; }
+.gl-edit h3, .gl-rem h3 { font-size: 18px; margin-bottom: 10px; }
+.gl-presets { margin-bottom: 12px; }
+.gl-steps { display: grid; gap: 8px; margin-bottom: 14px; }
+.gl-step { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 14.5px; }
+.gl-step .speed b { min-width: 42px; }
+.gl-timel { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; font-size: 14px; }
+.gl-time { font: inherit; font-size: 16px; padding: 7px 10px; border-radius: 10px; border: 1px solid var(--line2); background: var(--card2); color: var(--text); color-scheme: inherit; }
+.gl-rem .row { margin: 8px 0; }
+@media (max-width: 980px) { .gl-grid { grid-template-columns: 1fr 1fr; } .gl-grid > .gl-card { grid-column: 1 / -1; } }
+@media (max-width: 760px) { .gl-grid { grid-template-columns: 1fr; } .gl-home { margin-top: -40px; } .gl-card { padding: 14px; gap: 12px; } .gl-body { min-width: 0; } }

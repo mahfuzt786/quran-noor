@@ -90,6 +90,15 @@
     const log = store.get('log', []);
     log.push({ d: localDay(Date.now()), t: type, s: Math.round(score) });
     store.set('log', log.slice(-1500));
+    window.Goals?.afterLog();
+  }
+  // verses listened to the end, counted per day (kept apart from the log, which they would flood)
+  function countListen() {
+    const L = store.get('listen', {}), d = localDay(Date.now());
+    L[d] = (L[d] || 0) + 1;
+    const keep = Object.keys(L).sort().slice(-60), out = {}; keep.forEach(k => (out[k] = L[k]));
+    store.set('listen', out);
+    window.Goals?.afterLog();
   }
   function touchDay() {
     const today = localDay(Date.now());
@@ -222,6 +231,7 @@
   }
   function verseEnd() {
     const c = S.cur, v = c.ts[P.vi];
+    if (P.playing) countListen();
     const go = () => {
       clearWait();
       if (!P.playing) return;
@@ -462,6 +472,7 @@
           h('a', { class: 'btn glass', href: '#/learn' }, t('cta_learn')),
           h('button', { class: 'btn glass', onclick: () => $('#all').scrollIntoView({ behavior: 'smooth' }) }, t('cta_all'))))),
       h('div', { class: 'wrap' },
+        window.Goals ? window.Goals.homeCard() : null,
         hasProgress ? h('div', { class: 'stats' },
           [[S.streak.n || 0, t('st_streak')], [known, t('st_words')], [practiced, t('st_surahs')], [best || '—', t('st_pace')]]
             .map(([b, s], i) => h('div', { class: 'stat', style: `animation-delay:${i * 80}ms` }, h('b', {}, num(b)), h('span', {}, s)))) : null,
@@ -634,7 +645,7 @@
     route().then(() => window.scrollTo(0, keep));
   });
   window.Noor = { h, $, $$, sayWord, shuffle, openModal, closeModal, burst, store, touchDay, t, num, lang: () => S.lang, footer,
-    cur: () => S.cur, verseEl, pause, playOne, log: logPractice, chapters: () => S.chapters, sname };
+    cur: () => S.cur, verseEl, pause, playOne, log: logPractice, chapters: () => S.chapters, sname, toast };
   applyTheme(); bindPlayer();
   window.addEventListener('hashchange', route);
   route();
