@@ -83,6 +83,11 @@
           if (!text && !alts.length) { res.replaceChildren(h('p', { class: 'lp-bad' }, failMsg(ctx, error))); onResult && onResult(null); return; }
           const id = identify(alts.length ? alts : [text], ctx.X[0]);
           const ok = id.letter === ctx.X[0];
+          // per-letter result for the progress page: ever said correctly, and the latest attempt
+          const pron = window.Noor.store.get('pron', {}), p = pron[ctx.X[0]] || { ok: 0, n: 0 };
+          p.n++; if (ok) p.ok = 1; p.last = ok ? 1 : 0; if (!ok && id.letter) p.as = id.letter;
+          pron[ctx.X[0]] = p; window.Noor.store.set('pron', pron);
+          window.Noor.log('lp', ok ? 100 : 0); window.Noor.touchDay();
           showName(ctx, res, id, ok);
           onResult && onResult(ok, id);
         }
@@ -126,6 +131,7 @@
           const again = h('button', { class: 'btn sm gold', onclick: () => checkWord(ctx, res) }, h('span', { html: window.Recite.icons.mic }), L('Try again', 'আকৌ পঢ়ক'));
           const heard = h('span', { class: 'muted small' }, L('Heard: ', 'শুনা গ’ল: '), h('span', { class: 'ar', lang: 'ar', dir: 'rtl' }, best.heard || text));
           const word = [h('span', { class: 'ar', lang: 'ar' }, ex.t), ' (' + window.AsPron.word(ex.t) + ')'];
+          window.Noor.log('lw', best.status === 'ok' ? 100 : best.status === 'close' ? 60 : 0); window.Noor.touchDay();
           if (best.status === 'ok') res.replaceChildren(h('div', { class: 'lp-ok' }, h('b', {}, '✓ ' + L('Correct!', 'শুদ্ধ!')), ' ', ...word), h('p', {}, heard), h('div', { class: 'row left' }, hear));
           else res.replaceChildren(h('div', { class: best.status === 'close' ? 'lp-close' : 'lp-bad' }, h('b', {}, best.status === 'close' ? L('Nearly — ', 'প্ৰায় শুদ্ধ — ') : '✗ '), L('the word is ', 'শুদ্ধ শব্দটো হ’ল '), ...word),
             h('p', {}, heard), h('div', { class: 'row left' }, hear, again));

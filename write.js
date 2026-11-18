@@ -204,6 +204,7 @@
       const dotsWrong = r.missingDots || r.extraDots;
       const pct = Math.round(Math.min(r.f * 100, dotsWrong ? hi - 8 : 100));
       best[it.id] = Math.max(best[it.id] || 0, pct); store.set('write', best);
+      window.Noor.log('wr', pct); window.Noor.touchDay();
       const dotMsg = r.missingDots ? L('A dot is missing — check the dots.', 'এটা ফুট বাকী আছে — ফুটবোৰ চাওক।') : r.extraDots ? L('There is an extra dot — check the dots.', 'অতিৰিক্ত ফুট দিছে — ফুটবোৰ চাওক।') : '';
       const msg = dotMsg && pct >= mid ? L('Good shape — ', 'আকৃতি ভাল — ') + dotMsg : pct >= hi ? L('Excellent — well written!', 'চমৎকাৰ — বৰ সুন্দৰকৈ লিখিছে!') : pct >= mid ? L('Good — compare with the red parts and try again.', 'ভাল — ৰঙা অংশবোৰ চাই আকৌ চেষ্টা কৰক।') : L('Not yet — watch the demo, then try again.', 'এতিয়াও হোৱা নাই — দেখুওৱাটো চাই আকৌ চেষ্টা কৰক।');
       result.replaceChildren(...[

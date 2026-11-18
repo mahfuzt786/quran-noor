@@ -251,5 +251,5 @@
     $$('.ltab', tabs)[Math.min(store.get('learnTab', 0), TABS.length - 1)].click();
   }
 
-  window.Learn = { view };
+  window.Learn = { view, LET, forms };
 })();

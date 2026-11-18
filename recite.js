@@ -188,7 +188,7 @@
       h('p', { class: 'muted small rc-note' }, t('rc_note')));
     card.querySelector('.words').after(panel);
     if (r.correct === r.total) burst(panel);
-    N().touchDay();
+    N().touchDay(); N().log('rc', r.score * 100);
   }
 
   window.Recite = { start, stop: () => { stop(true); if (short) { try { short.rec.abort(); } catch { /* ignore */ } short = null; } }, supported: () => !!getSR(), icons, ensureReady, listen, speak };
