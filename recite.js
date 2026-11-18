@@ -30,10 +30,9 @@
     card.querySelector('.words').after(p);
   }
 
-  /** Start an attempt on verse index i of the current surah. */
-  function start(i) {
+  /** Runs `then` once speech recognition is available and the user has agreed to the microphone notice. */
+  function ensureReady(then) {
     const { store, openModal, closeModal, h, t } = N();
-    const cur = N().cur(); if (!cur || !cur.verses[i]) return;
     if (!getSR()) {
       openModal(h('h2', {}, t('rc_unsupported_t')), h('p', { class: 'muted' }, t('rc_unsupported')),
         h('div', { class: 'row' }, h('button', { class: 'btn gold', onclick: closeModal }, t('close'))));
@@ -42,11 +41,63 @@
     if (!store.get('rcConsent', false)) {
       openModal(h('h2', {}, t('rc_consent_t')), h('p', {}, t('rc_consent')), h('p', { class: 'muted small' }, t('rc_note')),
         h('div', { class: 'row' },
-          h('button', { class: 'btn gold', onclick: () => { store.set('rcConsent', true); closeModal(); begin(i); } }, t('rc_consent_ok')),
+          h('button', { class: 'btn gold', onclick: () => { store.set('rcConsent', true); closeModal(); then(); } }, t('rc_consent_ok')),
           h('button', { class: 'btn', onclick: closeModal }, t('rc_cancel'))));
       return;
     }
-    begin(i);
+    then();
+  }
+
+  /** Start an attempt on verse index i of the current surah. */
+  function start(i) {
+    const cur = N().cur(); if (!cur || !cur.verses[i]) return;
+    ensureReady(() => begin(i));
+  }
+
+  /**
+   * Short listening session for single letters and words.
+   * opts: { onInterim(text), onDone({ text, alts, error }), quietMs, limitMs }. Returns { stop(), abort() }.
+   * alts holds the recogniser's other guesses, which helps with very short sounds.
+   */
+  let short = null;
+  function listen(opts) {
+    if (short) { try { short.rec.abort(); } catch { /* ignore */ } short = null; }
+    stop(true); N().pause();
+    const SR = getSR(), rec = new SR();
+    rec.lang = 'ar-SA'; rec.continuous = false; rec.interimResults = true; rec.maxAlternatives = 5;
+    const me = { rec, text: '', interim: '', alts: [], error: null, heard: false, last: Date.now(), t0: Date.now(), done: false };
+    short = me;
+    rec.onresult = (e) => {
+      let interim = '';
+      for (let k = e.resultIndex; k < e.results.length; k++) {
+        const res = e.results[k];
+        if (res.isFinal) { me.text += ' ' + res[0].transcript; for (let a = 0; a < res.length; a++) me.alts.push(res[a].transcript); }
+        else interim += ' ' + res[0].transcript;
+      }
+      me.interim = interim; me.heard = true; me.last = Date.now();
+      opts.onInterim && opts.onInterim((me.text + ' ' + interim).trim());
+    };
+    rec.onerror = (e) => { me.error = e.error; };
+    rec.onend = () => {
+      clearInterval(me.timer); if (short === me) short = null;
+      if (me.done) return; me.done = true;
+      const text = (me.text + ' ' + me.interim).trim();
+      if (me.interim.trim()) me.alts.push(me.interim.trim());
+      opts.onDone({ text, alts: me.alts.length ? me.alts : (text ? [text] : []), error: me.error });
+    };
+    const quiet = opts.quietMs || 1500, limit = opts.limitMs || 7000;
+    me.timer = setInterval(() => { if ((me.heard && Date.now() - me.last > quiet) || Date.now() - me.t0 > limit) { try { rec.stop(); } catch { /* ignore */ } } }, 250);
+    try { rec.start(); } catch { me.done = true; clearInterval(me.timer); opts.onDone({ text: '', alts: [], error: 'start' }); }
+    return { stop: () => { try { rec.stop(); } catch { /* ignore */ } }, abort: () => { me.done = true; clearInterval(me.timer); try { rec.abort(); } catch { /* ignore */ } } };
+  }
+
+  /** Speak Arabic text with the browser's voice, if it has an Arabic one. Returns false when it cannot. */
+  function speak(text) {
+    const ss = window.speechSynthesis; if (!ss || !window.SpeechSynthesisUtterance) return false;
+    const voices = ss.getVoices(), v = voices.find(x => /^ar/i.test(x.lang));
+    if (voices.length && !v) return false;
+    const u = new SpeechSynthesisUtterance(text); u.lang = 'ar-SA'; u.rate = .8; if (v) u.voice = v;
+    ss.cancel(); ss.speak(u); return true;
   }
 
   function begin(i) {
@@ -140,5 +191,7 @@
     N().touchDay();
   }
 
-  window.Recite = { start, stop: () => stop(true), supported: () => !!getSR(), icons };
+  window.Recite = { start, stop: () => { stop(true); if (short) { try { short.rec.abort(); } catch { /* ignore */ } short = null; } }, supported: () => !!getSR(), icons, ensureReady, listen, speak };
+  // voices load asynchronously in some browsers
+  try { window.speechSynthesis && window.speechSynthesis.getVoices(); } catch { /* ignore */ }
 })();

@@ -115,7 +115,8 @@
             h('div', { class: 'forms' }, [L('Alone', 'অকলে'), L('Start', 'আৰম্ভণি'), L('Middle', 'মাজত'), L('End', 'শেষত')].map((lab, i) => h('div', {}, h('span', { class: 'ar', lang: 'ar' }, f[i]), h('small', {}, lab)))),
             j ? null : h('p', { class: 'muted' }, L('This letter never joins to the letter after it, so its “start” and “middle” shapes look like “alone” and “end”.', 'এই আখৰ পিছৰ আখৰৰ লগত কেতিয়াও জোৰা নালাগে; সেয়ে ইয়াৰ “আৰম্ভণি” আৰু “মাজত” ৰূপ “অকলে” আৰু “শেষত”-ৰ দৰেই।')),
             fam ? h('p', { class: 'muted' }, L('Same shape, different dots: ', 'একে ৰূপ, বেলেগ ফুট: '), h('span', { class: 'ar sm', lang: 'ar' }, fam.join('  '))) : null,
-            ex ? h('div', { class: 'row left' }, wordCard(ex)) : null));
+            ex ? h('div', { class: 'row left' }, wordCard(ex)) : null,
+            window.LetterCheck ? window.LetterCheck.box({ h, L, num, X, LET, sayWord, ex, AS }) : null));
         detail.classList.remove('pop'); void detail.offsetWidth; detail.classList.add('pop');
         if (ex && btn && btn.dataset.user) sayWord(ex);
       };
@@ -231,6 +232,10 @@
         'খৰকৈ তিলাৱত কৰিবলৈ প্ৰথমে আখৰ দেখামাত্ৰে চিনি পাব লাগিব। এই অনুশীলনত এটা আখৰ তাৰ চাৰিটা ৰূপৰ এটাত দেখা যাব আৰু আপুনি তাৰ নাম বাছিব।')),
       h('div', { class: 'endcard' }, h('h3', {}, L('Letter recognition drill', 'আখৰ চিনাৰ অনুশীলন')), h('p', {}, L('Ten letters. Your best score so far: ', 'দহটা আখৰ। এতিয়ালৈকে আপোনাৰ সৰ্বোচ্চ নম্বৰ: ') + num(store.get('letterQuiz', 0) + '/10')),
         h('div', { class: 'row' }, h('button', { class: 'btn gold', onclick: quiz }, L('Start the drill', 'অনুশীলন আৰম্ভ কৰক')))),
+      h('div', { class: 'endcard' }, h('h3', {}, '🎤 ' + L('Letter pronunciation drill', 'আখৰ উচ্চাৰণৰ অনুশীলন')),
+        h('p', {}, L('Ten letters appear one by one; say each letter’s name into the microphone. If it sounds like a different letter, you are told which one and how to say it correctly. Your best score so far: ',
+          'দহটা আখৰ এটা এটাকৈ আহিব; প্ৰতিটোৰ নাম মাইকত কওক। আন আখৰৰ দৰে শুনা গ’লে, কোনটোৰ দৰে শুনা গ’ল আৰু শুদ্ধকৈ কেনেকৈ ক’ব লাগে সেয়া দেখুৱাব। এতিয়ালৈকে আপোনাৰ সৰ্বোচ্চ নম্বৰ: ') + num(store.get('pronQuiz', 0) + '/10')),
+        h('div', { class: 'row' }, h('button', { class: 'btn gold', onclick: () => window.LetterCheck.drill({ h, L, num, LET, D, sayWord, store, burst, openModal, closeModal, shuffle, AS }) }, L('Start speaking', 'কোৱা আৰম্ভ কৰক')))),
       h('div', { class: 'endcard' }, h('h3', {}, L('Then read real verses', 'তাৰ পিছত প্ৰকৃত আয়াত পঢ়ক')), h('p', {}, L('Open a short surah, hide the pronunciation lines, and try to read each word before you tap it to check.',
         'এটা চুটি ছুৰা খোলক, উচ্চাৰণৰ শাৰীবোৰ লুকুৱাই ৰাখক, আৰু প্ৰতিটো শব্দত টিপি পৰীক্ষা কৰাৰ আগতে নিজে পঢ়িবলৈ চেষ্টা কৰক।')),
         h('div', { class: 'row' }, h('a', { class: 'btn', href: '#/s/112' }, L('Practise on Al-Ikhlas →', 'ছুৰা ইখলাছত অনুশীলন কৰক →')))));

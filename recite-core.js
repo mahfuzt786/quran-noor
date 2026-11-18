@@ -116,6 +116,6 @@
     return { words, extra, correct, total: words.length, score: words.length ? correct / words.length : 0 };
   }
 
-  const api = { compare, norm };
+  const api = { compare, norm, sim };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.ReciteCore = api;
 })(typeof window !== 'undefined' ? window : globalThis);
