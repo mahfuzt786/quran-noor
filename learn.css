@@ -215,6 +215,7 @@
 .gl-card { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px 20px; box-shadow: var(--shadow); }
 .gl-card.met { border-color: var(--ok); box-shadow: 0 0 0 1px var(--ok), var(--shadow); }
 .gl-home { margin-top: -60px; position: relative; z-index: 2; margin-bottom: 14px; }
+.gl-home + .stats { margin-top: 0; }
 .gl-ringwrap { position: relative; flex: none; display: grid; place-items: center; }
 .gl-ring { display: block; }
 .gl-track { fill: none; stroke: var(--line); stroke-width: 8; }
