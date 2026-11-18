@@ -131,7 +131,7 @@
     $('meta[name="theme-color"]')?.setAttribute('content', S.set.theme === 'night' ? '#0b1028' : '#f6f0e2');
     $('#themeBtn').setAttribute('aria-label', t('theme')); $('#themeBtn').title = t('theme');
     $('#themeBtn').dataset.mode = S.set.theme;
-    $('#navLearn .nl').textContent = t('nav_learn'); $('#navSurahs .nl').textContent = t('nav_surahs'); $('#navProgress .nl').textContent = t('nav_progress');
+    $('#navLearn .nl').textContent = t('nav_learn'); $('#navSurahs .nl').textContent = t('nav_surahs'); $('#navProgress .nl').textContent = t('nav_progress'); $('#navSaved .nl').textContent = t('nav_saved'); window.Bookmarks?.badge();
     $$('#langSwitch button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === S.lang)));
     $('#langSwitch').setAttribute('aria-label', t('lang_label'));
     $('#timerStop').textContent = t('stop'); $('.skip').textContent = t('skip');
@@ -507,6 +507,7 @@
         h('span', { class: 'vnum' }, num(v.n)), h('span', { class: 'vkey' }, num(v.key)),
         h('button', { class: 'vmic' + ((store.get('rc', {})[v.key] || 0) === 100 ? ' passed' : ''), title: t('rc_btn'), 'aria-label': t('rc_btn') + ' ' + num(v.n), onclick: () => window.Recite.start(i) },
           h('span', { html: window.Recite ? window.Recite.icons.mic : '' }), h('span', { class: 'vmic-l' }, t('rc_btn'))),
+        window.Bookmarks ? window.Bookmarks.button(v) : null,
         h('button', { class: 'vplay', title: t('play_from', v.n), 'aria-label': t('play_from', v.n), onclick: () => play(i) },
           h('span', { html: '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>' }))),
       h('div', { class: 'words', dir: 'rtl', lang: 'ar' }, v.w.map(w => w.end
@@ -618,7 +619,8 @@
     const hsh = location.hash;
     $('#navLearn').classList.toggle('on', hsh.startsWith('#/learn'));
     $('#navProgress').classList.toggle('on', hsh.startsWith('#/progress'));
-    $('#navSurahs').classList.toggle('on', !hsh.startsWith('#/learn') && !hsh.startsWith('#/progress'));
+    $('#navSaved').classList.toggle('on', hsh.startsWith('#/saved'));
+    $('#navSurahs').classList.toggle('on', !/^#\/(learn|progress|saved)/.test(hsh));
   }
   async function route() {
     closeModal(); $('#tip').hidden = true; navActive(); window.Recite?.stop();
@@ -632,6 +634,7 @@
     if (m) return viewSurah(Math.min(114, Math.max(1, +m[1])), m[2] ? +m[2] : 0);
     stopAll(); stopTimer(false); S.cur = null; S.token++;
     if (location.hash.startsWith('#/progress')) { document.title = t('nav_progress') + (S.lang === 'as' ? ' · নূৰ' : ' · Noor'); $('#player').hidden = true; window.Progress.view($('#app')); window.scrollTo(0, 0); return; }
+    if (location.hash.startsWith('#/saved')) { document.title = t('bm_title') + (S.lang === 'as' ? ' · নূৰ' : ' · Noor'); $('#player').hidden = true; window.Bookmarks.view($('#app')); window.scrollTo(0, 0); return; }
     if (location.hash.startsWith('#/learn')) { document.title = t('nav_learn') + (S.lang === 'as' ? ' · নূৰ' : ' · Noor'); $('#player').hidden = true; window.Learn.view($('#app')); window.scrollTo(0, 0); return; }
     viewHome();
     window.scrollTo(0, 0);

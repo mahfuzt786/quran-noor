@@ -163,6 +163,7 @@
         h('div', { class: 'shead-txt' }, h('div', { class: 'sub' }, t('pg_sub')), h('h1', {}, t('pg_title'))))),
       h('div', { class: 'wrap' },
         window.Goals ? window.Goals.section() : null,
+        window.Bookmarks ? window.Bookmarks.progressSection() : null,
         hasAny ? [tiles, activity, recitation, writing, speaking,
           h('div', { class: 'pg-foot' }, h('p', { class: 'muted small' }, t('pg_device_note')), h('button', { class: 'btn sm', onclick: reset }, t('pg_reset')))]
           : h('div', { class: 'endcard pg-empty' }, h('h3', {}, t('pg_empty_t')), h('p', {}, t('pg_empty')),

@@ -59,7 +59,7 @@
 
   /**
    * compare(verseWords, heardText) →
-   *   { words: [{status: 'ok'|'close'|'wrong'|'missed', heard: '...'}], extra: ['...'], correct, total, score }
+   *   { words: [{status: 'ok'|'close'|'wrong'|'missed', s: 0..1 similarity, heard: '...'}], extra: ['...'], correct, total, score, match }
    * Alignment is a small edit-distance over words that also allows one word to match two (the recogniser
    * may split or join words differently from the Mushaf).
    */
@@ -109,11 +109,14 @@
       const closeBar = e.k[0].length <= 3 ? .67 : .5;
       const status = !tk || (!tk.heard && tk.s === 0) ? 'missed' : tk.s >= .75 ? 'ok' : tk.s >= closeBar ? 'close' : 'wrong';
       const rank = { ok: 0, close: 1, wrong: 2, missed: 3 };
-      if (rank[status] > rank[w.status]) { w.status = status; w.s = tk ? tk.s : 0; }
+      if (rank[status] > rank[w.status]) w.status = status;
+      w.s = Math.min(w.s, tk ? tk.s : 0);
       if (tk && tk.heard && !w.heard.split(' ').includes(tk.heard)) w.heard = (w.heard ? w.heard + ' ' : '') + tk.heard;
     });
     const correct = words.filter(w => w.status === 'ok').length;
-    return { words, extra, correct, total: words.length, score: words.length ? correct / words.length : 0 };
+    // match: how closely the heard words resemble the verse overall (0..1), counting near-misses partly
+    const match = words.length ? words.reduce((t, w) => t + w.s, 0) / words.length : 0;
+    return { words, extra, correct, total: words.length, score: words.length ? correct / words.length : 0, match };
   }
 
   const api = { compare, norm, sim };
