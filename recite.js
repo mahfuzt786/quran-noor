@@ -54,6 +54,13 @@
     return {
       get: (k) => tx('readonly', st => st.get(k)).catch(() => null),
       del: (k) => tx('readwrite', st => st.delete(k)).catch(() => null),
+      /** every recording as [verseKey, record] (for backups) */
+      async all() {
+        try { const [keys, vals] = await Promise.all([tx('readonly', st => st.getAllKeys()), tx('readonly', st => st.getAll())]); return keys.map((k, n) => [k, vals[n]]); } catch { return []; }
+      },
+      clear: () => tx('readwrite', st => st.clear()).catch(() => null),
+      /** store a record as it is, without pruning (for restoring a backup) */
+      set: (k, rec) => tx('readwrite', st => st.put(rec, k)).catch(() => null),
       async put(k, rec) {
         try {
           await tx('readwrite', st => st.put(rec, k));

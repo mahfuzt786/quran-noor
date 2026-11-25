@@ -168,6 +168,7 @@
           h('div', { class: 'pg-foot' }, h('p', { class: 'muted small' }, t('pg_device_note')), h('button', { class: 'btn sm', onclick: reset }, t('pg_reset')))]
           : h('div', { class: 'endcard pg-empty' }, h('h3', {}, t('pg_empty_t')), h('p', {}, t('pg_empty')),
             h('div', { class: 'row' }, h('a', { class: 'btn gold', href: '#/s/1' }, t('pg_go_surah')), h('a', { class: 'btn', href: '#/learn' }, t('nav_learn')))),
+        window.Backup ? window.Backup.section() : null,
         footer()));
   }
 
