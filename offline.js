@@ -16,13 +16,29 @@
 
   /* ---------- service worker & updates ---------- */
   let waiting = null, reloading = false;
+  const UPD_ICON = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8"/><path d="M4 3v5h5"/><path d="M4 13a8 8 0 0 0 14.3 4.9L20 16"/><path d="M20 21v-5h-5"/></svg>';
+  /** A small round icon in the corner; tapping it opens a card with the update button. */
   function showUpdate(w) {
     waiting = w;
     const { h, t } = N();
-    document.querySelector('.upd-bar')?.remove();
-    document.body.append(h('div', { class: 'upd-bar', role: 'status' }, h('span', {}, t('off_update')),
-      h('button', { class: 'btn sm gold', onclick: () => { reloading = true; waiting.postMessage('skip'); } }, t('off_update_btn')),
-      h('button', { class: 'icon-btn upd-x', 'aria-label': t('close'), onclick: (e) => e.currentTarget.parentElement.remove() }, '✕')));
+    document.querySelector('.upd')?.remove();
+    const pop = h('div', { class: 'upd-pop', id: 'updPop', role: 'dialog', 'aria-label': t('off_update'), hidden: true },
+      h('div', { class: 'upd-pop-h' }, h('span', { class: 'upd-pop-ic', html: UPD_ICON }), h('b', {}, t('off_update'))),
+      h('p', { class: 'muted small' }, t('off_update_d')),
+      h('div', { class: 'row left' },
+        h('button', { class: 'btn sm gold', onclick: () => { reloading = true; waiting.postMessage('skip'); } }, t('off_update_btn')),
+        h('button', { class: 'btn sm', onclick: () => toggle(false) }, t('off_later'))));
+    const fab = h('button', { class: 'upd-fab', title: t('off_update_icon'), 'aria-label': t('off_update_icon'), 'aria-expanded': 'false', 'aria-controls': 'updPop',
+      onclick: (e) => { e.stopPropagation(); toggle(pop.hidden); } }, h('span', { html: UPD_ICON }), h('i', { class: 'upd-dot', 'aria-hidden': 'true' }));
+    const box = h('div', { class: 'upd' }, pop, fab);
+    function toggle(open) {
+      pop.hidden = !open; fab.setAttribute('aria-expanded', String(open)); box.classList.toggle('open', open);
+      if (open) pop.querySelector('.btn.gold').focus();
+    }
+    // tap elsewhere or press Escape to fold it back into the icon
+    document.addEventListener('click', (e) => { if (!pop.hidden && !box.contains(e.target)) toggle(false); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !pop.hidden) { toggle(false); fab.focus(); } });
+    document.body.append(box);
   }
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
     window.addEventListener('load', () => {

@@ -312,8 +312,6 @@
 
 /* ============ offline & app ============ */
 #netbar { position: sticky; top: var(--hdr, 62px); z-index: 30; padding: 8px 16px; text-align: center; font-size: 14px; font-weight: 700; background: var(--warn); color: #261a00; }
-.upd-bar { position: fixed; left: 50%; translate: -50% 0; bottom: 96px; z-index: 75; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center;
-  padding: 10px 16px; border-radius: 16px; background: var(--card2); border: 1px solid var(--gold); box-shadow: var(--shadow-lg); width: max-content; max-width: calc(100vw - 32px); font-weight: 700; font-size: 14.5px; }
 .btn.off-btn.kept { border-color: var(--ok); color: var(--ok); }
 .off-opts { list-style: none; padding: 0; margin: 10px 0; display: grid; gap: 6px; }
 .off-total { font-weight: 700; margin: 4px 0 10px; }
@@ -329,7 +327,6 @@
 .inst-txt { flex: 1; min-width: 200px; display: grid; gap: 2px; }
 .inst-card.home { margin-bottom: 14px; }
 .inst-ok { font-weight: 700; color: var(--ok); }
-@media (max-width: 760px) { .upd-bar { bottom: 150px; } }
 
 /* ============ smart review ============ */
 .rv-home { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 14px 18px; margin: 14px 0; border-radius: var(--r-lg); background: var(--card); border: 1px solid var(--gold); color: var(--text); }
@@ -362,4 +359,20 @@
 .rv-how { margin-top: 18px; }
 @media (max-width: 980px) { .rv-stats { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 760px) { .rv-stats { grid-template-columns: repeat(2, 1fr); } .rv-card { padding: 14px; } }
-.upd-x { width: 32px; height: 32px; font-size: 14px; }
+
+/* ============ update icon ============ */
+.upd { position: fixed; right: 16px; bottom: calc(20px + env(safe-area-inset-bottom)); z-index: 75; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+body:has(#player:not([hidden])) .upd { bottom: calc(108px + env(safe-area-inset-bottom)); }
+.upd-fab { position: relative; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--gold); color: var(--gold-ink); box-shadow: var(--shadow-lg); animation: updin .4s both; transition: transform .2s; }
+.upd-fab:hover { transform: scale(1.07); }
+.upd-fab svg { animation: updspin 1.2s ease-in-out 2 .5s; }
+.upd.open .upd-fab { transform: rotate(-30deg); }
+.upd-dot { position: absolute; top: 2px; right: 2px; width: 11px; height: 11px; border-radius: 50%; background: var(--bad); border: 2px solid var(--bg); }
+.upd-pop { width: min(320px, calc(100vw - 32px)); padding: 14px 16px; border-radius: 16px; background: var(--card2); border: 1px solid var(--gold); box-shadow: var(--shadow-lg); display: grid; gap: 8px; animation: pop .2s both; transform-origin: bottom right; }
+.upd-pop-h { display: flex; align-items: center; gap: 8px; font-size: 15px; }
+.upd-pop-ic { color: var(--gold); display: inline-flex; }
+.upd-pop p { margin: 0; }
+@keyframes updin { from { opacity: 0; scale: .4; } to { opacity: 1; scale: 1; } }
+@keyframes updspin { to { rotate: 360deg; } }
+@media (max-width: 760px) { body:has(#player:not([hidden])) .upd { bottom: calc(150px + env(safe-area-inset-bottom)); } }
+@media (prefers-reduced-motion: reduce) { .upd-fab, .upd-fab svg, .upd-pop { animation: none; } }
