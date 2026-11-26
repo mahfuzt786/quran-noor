@@ -11,6 +11,10 @@
   Header always unset Permissions-Policy
   Header always set Permissions-Policy "microphone=(self), autoplay=(self), web-share=(self), fullscreen=(self), screen-wake-lock=(self), identity-credentials-get=(self \"https://accounts.google.com\"), camera=(), geolocation=(), payment=(), usb=(), midi=(), magnetometer=(), gyroscope=(), accelerometer=(), display-capture=(), publickey-credentials-get=(), xr-spatial-tracking=()"
 
+  # Google sign-in opens a popup that reports back to this page; the site-wide "same-origin" cuts that link
+  Header unset Cross-Origin-Opener-Policy
+  Header always set Cross-Origin-Opener-Policy "same-origin-allow-popups"
+
   # the page and the service worker must be re-checked on every visit so updates arrive; versioned files (?v=) can be cached long
   <FilesMatch "^(index\.html|sw\.js|manifest\.webmanifest)$">
     Header unset Cache-Control
