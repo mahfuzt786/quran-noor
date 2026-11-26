@@ -478,6 +478,7 @@
         hasProgress ? h('div', { class: 'stats' },
           [[S.streak.n || 0, t('st_streak')], [known, t('st_words')], [practiced, t('st_surahs')], [best || '—', t('st_pace')]]
             .map(([b, s], i) => h('div', { class: 'stat', style: `animation-delay:${i * 80}ms` }, h('b', {}, num(b)), h('span', {}, s)))) : null,
+        window.Review ? window.Review.homeCard() : null,
         window.Offline ? window.Offline.installCard(true) : null,
         h('section', { class: 'sec' },
           h('div', { class: 'sec-title' }, h('h2', {}, t('how_title')), h('span', {}, t('how_sub'))),
@@ -622,9 +623,9 @@
   function navActive() {
     const hsh = location.hash;
     $('#navLearn').classList.toggle('on', hsh.startsWith('#/learn'));
-    $('#navProgress').classList.toggle('on', hsh.startsWith('#/progress'));
+    $('#navProgress').classList.toggle('on', /^#\/(progress|review)/.test(hsh));
     $('#navSaved').classList.toggle('on', hsh.startsWith('#/saved'));
-    $('#navSurahs').classList.toggle('on', !/^#\/(learn|progress|saved)/.test(hsh));
+    $('#navSurahs').classList.toggle('on', !/^#\/(learn|progress|saved|review)/.test(hsh));
   }
   async function route() {
     closeModal(); $('#tip').hidden = true; navActive(); window.Recite?.stop();
@@ -638,6 +639,7 @@
     if (m) return viewSurah(Math.min(114, Math.max(1, +m[1])), m[2] ? +m[2] : 0);
     stopAll(); stopTimer(false); S.cur = null; S.token++;
     if (location.hash.startsWith('#/progress')) { document.title = t('nav_progress') + (S.lang === 'as' ? ' · নূৰ' : ' · Noor'); $('#player').hidden = true; window.Progress.view($('#app')); window.scrollTo(0, 0); return; }
+    if (location.hash.startsWith('#/review')) { document.title = t('rv_title') + (S.lang === 'as' ? ' · নূৰ' : ' · Noor'); $('#player').hidden = true; window.Review.view($('#app')); window.scrollTo(0, 0); return; }
     if (location.hash.startsWith('#/saved')) { document.title = t('bm_title') + (S.lang === 'as' ? ' · নূৰ' : ' · Noor'); $('#player').hidden = true; window.Bookmarks.view($('#app')); window.scrollTo(0, 0); return; }
     if (location.hash.startsWith('#/learn')) { document.title = t('nav_learn') + (S.lang === 'as' ? ' · নূৰ' : ' · Noor'); $('#player').hidden = true; window.Learn.view($('#app')); window.scrollTo(0, 0); return; }
     viewHome();
@@ -652,6 +654,7 @@
     route().then(() => window.scrollTo(0, keep));
   });
   window.Noor = { h, $, $$, sayWord, shuffle, openModal, closeModal, burst, store, touchDay, t, num, lang: () => S.lang, footer,
+    surah: (id) => loadSurah(id).then(raw => ({ raw, verses: shapeVerses(id, raw, S.set.wbw) })),
     cur: () => S.cur, verseEl, pause, playOne, log: logPractice, chapters: () => S.chapters, sname, toast };
   applyTheme(); bindPlayer();
   window.addEventListener('hashchange', route);

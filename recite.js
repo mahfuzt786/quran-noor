@@ -152,7 +152,7 @@
     if (short) { try { short.rec.abort(); } catch { /* ignore */ } short = null; }
     stop(true); N().pause();
     const SR = getSR(), rec = new SR();
-    rec.lang = 'ar-SA'; rec.continuous = false; rec.interimResults = true; rec.maxAlternatives = 5;
+    rec.lang = 'ar-SA'; rec.continuous = !!opts.continuous; rec.interimResults = true; rec.maxAlternatives = opts.continuous ? 1 : 5;
     const me = { rec, text: '', interim: '', alts: [], error: null, heard: false, last: Date.now(), t0: Date.now(), done: false };
     short = me;
     rec.onresult = (e) => {
@@ -268,6 +268,7 @@
     // remember the best score for this verse
     const best = store.get('rc', {}), vk = cur.verses[i].key;
     best[vk] = Math.max(best[vk] || 0, Math.round(r.score * 100)); store.set('rc', best);
+    window.Review?.result('v:' + vk, r.score === 1 ? 'good' : r.score >= .7 ? 'hard' : 'again');
     card.querySelector('.vmic')?.classList.toggle('passed', best[vk] === 100);
 
     const label = { close: t('rc_close'), wrong: t('rc_wrong'), missed: t('rc_missed') };

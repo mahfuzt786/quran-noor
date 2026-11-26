@@ -21,7 +21,8 @@
     const { h, t } = N();
     document.querySelector('.upd-bar')?.remove();
     document.body.append(h('div', { class: 'upd-bar', role: 'status' }, h('span', {}, t('off_update')),
-      h('button', { class: 'btn sm gold', onclick: () => { reloading = true; waiting.postMessage('skip'); } }, t('off_update_btn'))));
+      h('button', { class: 'btn sm gold', onclick: () => { reloading = true; waiting.postMessage('skip'); } }, t('off_update_btn')),
+      h('button', { class: 'icon-btn upd-x', 'aria-label': t('close'), onclick: (e) => e.currentTarget.parentElement.remove() }, '✕')));
   }
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
     window.addEventListener('load', () => {

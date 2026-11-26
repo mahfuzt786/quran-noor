@@ -24,7 +24,7 @@
     const b = N().h('button', { class: 'vbm', onclick: () => {
       const l = list(), k = l.findIndex(x => x.k === v.key);
       if (k >= 0) { l.splice(k, 1); save(l); paint(b, false, v.key); N().toast(N().t('bm_removed')); }
-      else { l.unshift(snapshot(v)); save(l); paint(b, true, v.key); N().toast(N().t('bm_added')); }
+      else { l.unshift(snapshot(v)); save(l); paint(b, true, v.key); window.Review?.add('v:' + v.key); N().toast(N().t('bm_added')); }
     } }, N().h('span', { html: ICON }));
     paint(b, has(v.key), v.key);
     return b;

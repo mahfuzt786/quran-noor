@@ -53,7 +53,7 @@
       h('h4', {}, '🎤 ' + L('Pronunciation check', 'উচ্চাৰণ পৰীক্ষা')),
       h('p', { class: 'muted small' }, L('Say the name of the letter, or read the example word aloud.', 'আখৰটোৰ নাম কওক, বা উদাহৰণ শব্দটো উচ্চস্বৰে পঢ়ক।')),
       h('div', { class: 'row left' },
-        h('button', { class: 'btn sm gold', onclick: () => checkName(ctx, res) }, h('span', { html: window.Recite.icons.mic }), L('Say its name', 'নামটো কওক')),
+        h('button', { class: 'btn sm gold', onclick: () => checkName(ctx, res, ctx.onResult) }, h('span', { html: window.Recite.icons.mic }), L('Say its name', 'নামটো কওক')),
         ex ? h('button', { class: 'btn sm', onclick: () => checkWord(ctx, res) }, h('span', { html: window.Recite.icons.mic }), L('Read the word ', 'শব্দটো পঢ়ক '), h('span', { class: 'ar', lang: 'ar' }, ex.t)) : null),
       res);
     return wrap;
@@ -87,6 +87,7 @@
           const pron = window.Noor.store.get('pron', {}), p = pron[ctx.X[0]] || { ok: 0, n: 0 };
           p.n++; if (ok) p.ok = 1; p.last = ok ? 1 : 0; if (!ok && id.letter) p.as = id.letter;
           pron[ctx.X[0]] = p; window.Noor.store.set('pron', pron);
+          window.Review?.result('p:' + ctx.X[0], ok ? 'good' : 'again');
           window.Noor.log('lp', ok ? 100 : 0); window.Noor.touchDay();
           showName(ctx, res, id, ok);
           onResult && onResult(ok, id);
@@ -99,7 +100,7 @@
     const { h, L, X, LET } = ctx;
     const target = X, other = id.letter && !ok ? nameOf(LET, id.letter) : null;
     const hear = h('button', { class: 'btn sm', onclick: () => { if (!window.Recite.speak(NAMES[target[0]][0]) && ctx.ex) ctx.sayWord(ctx.ex); } }, '🔊 ' + L('Hear the correct name', 'শুদ্ধ নামটো শুনক'));
-    const again = h('button', { class: 'btn sm gold', onclick: () => checkName(ctx, res) }, h('span', { html: window.Recite.icons.mic }), L('Try again', 'আকৌ কওক'));
+    const again = h('button', { class: 'btn sm gold', onclick: () => checkName(ctx, res, ctx.onResult) }, h('span', { html: window.Recite.icons.mic }), L('Try again', 'আকৌ কওক'));
     const heard = id.heard ? h('span', { class: 'muted small' }, L('Heard: ', 'শুনা গ’ল: '), h('span', { class: 'ar', lang: 'ar', dir: 'rtl' }, id.heard)) : null;
     if (ok) {
       res.replaceChildren(h('div', { class: 'lp-ok' }, h('b', {}, '✓ ' + L('Correct!', 'শুদ্ধ!')), ' ', L('You said the name of ', 'আপুনি শুদ্ধকৈ কৈছে: '), h('span', { class: 'ar', lang: 'ar' }, target[0]), ' (' + target[1] + ')'), heard ? h('p', {}, heard) : null, h('div', { class: 'row left' }, hear));

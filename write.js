@@ -116,6 +116,8 @@
     const css = getComputedStyle(document.documentElement);
     const col = (v) => css.getPropertyValue(v).trim() || '#f2c66d';
     let kind = store.get('wKind', 'letter'), mode = store.get('wMode', 'trace'), li = store.get('wLetter', 1), fi = 0, wi = 0;
+    const fixed = ctx.fixedLetter != null;     // smart review: one letter, no picker
+    if (fixed) { kind = 'letter'; li = ctx.fixedLetter; }
     let strokes = [], checked = null, demoT = null;
     const best = store.get('write', {});
     const item = () => kind === 'letter' ? { text: forms(LET[li][0], LET[li][5])[fi], id: 'l' + li + '.' + fi, name: LET[li][1], ex: D.ex[LET[li][0]] } : { text: WORDS[wi][0], id: 'w' + wi, name: WORDS[wi][1], mean: WORDS[wi][2] };
@@ -130,13 +132,13 @@
     const controls = h('div', { class: 'wcontrols' });
     function drawControls() {
       controls.replaceChildren(
-        h('div', { class: 'tgroup' }, h('span', { class: 'tlabel' }, L('Write', 'লিখক')), seg([['letter', L('Letters', 'আখৰ')], ['word', L('Words', 'শব্দ')]], kind, v => { kind = v; store.set('wKind', v); reset(); drawAll(); })),
+        fixed ? null : h('div', { class: 'tgroup' }, h('span', { class: 'tlabel' }, L('Write', 'লিখক')), seg([['letter', L('Letters', 'আখৰ')], ['word', L('Words', 'শব্দ')]], kind, v => { kind = v; store.set('wKind', v); reset(); drawAll(); })),
         h('div', { class: 'tgroup' }, h('span', { class: 'tlabel' }, L('Mode', 'ধৰণ')), seg([['trace', L('Trace over', 'ওপৰেদি লিখক')], ['free', L('From memory', 'নিজে লিখক')]], mode, v => { mode = v; store.set('wMode', v); reset(); drawAll(); })));
     }
     function drawPicker() {
       if (kind === 'letter') {
         picker.replaceChildren(
-          h('div', { class: 'wletters', dir: 'rtl' }, LET.map((X, i) => h('button', { class: 'chip arc' + (i === li ? ' on' : '') + ((best['l' + i + '.0'] || 0) >= 70 ? ' done' : ''), lang: 'ar', 'aria-label': X[1], onclick: () => { li = i; fi = 0; store.set('wLetter', i); reset(); drawAll(); } }, X[0]))),
+          fixed ? null : h('div', { class: 'wletters', dir: 'rtl' }, LET.map((X, i) => h('button', { class: 'chip arc' + (i === li ? ' on' : '') + ((best['l' + i + '.0'] || 0) >= 70 ? ' done' : ''), lang: 'ar', 'aria-label': X[1], onclick: () => { li = i; fi = 0; store.set('wLetter', i); reset(); drawAll(); } }, X[0]))),
           h('div', { class: 'row left' }, [L('Alone', 'অকলে'), L('Start', 'আৰম্ভণি'), L('Middle', 'মাজত'), L('End', 'শেষত')].map((lab, i) => h('button', { class: 'chip' + (i === fi ? ' on' : ''), onclick: () => { fi = i; reset(); drawAll(); } }, lab))));
       } else {
         picker.replaceChildren(h('div', { class: 'row left' }, WORDS.map((w, i) => h('button', { class: 'chip' + (i === wi ? ' on' : '') + ((best['w' + i] || 0) >= 70 ? ' done' : ''), onclick: () => { wi = i; reset(); drawAll(); } }, h('span', { class: 'ar', lang: 'ar' }, w[0]), ' ' + w[1]))));
@@ -205,6 +207,8 @@
       const pct = Math.round(Math.min(r.f * 100, dotsWrong ? hi - 8 : 100));
       best[it.id] = Math.max(best[it.id] || 0, pct); store.set('write', best);
       window.Noor.log('wr', pct); window.Noor.touchDay();
+      const grade = pct >= hi ? 'good' : pct >= mid ? 'hard' : 'again';
+      if (kind === 'letter') window.Review?.result('w:' + li, grade);
       const dotMsg = r.missingDots ? L('A dot is missing — check the dots.', 'এটা ফুট বাকী আছে — ফুটবোৰ চাওক।') : r.extraDots ? L('There is an extra dot — check the dots.', 'অতিৰিক্ত ফুট দিছে — ফুটবোৰ চাওক।') : '';
       const msg = dotMsg && pct >= mid ? L('Good shape — ', 'আকৃতি ভাল — ') + dotMsg : pct >= hi ? L('Excellent — well written!', 'চমৎকাৰ — বৰ সুন্দৰকৈ লিখিছে!') : pct >= mid ? L('Good — compare with the red parts and try again.', 'ভাল — ৰঙা অংশবোৰ চাই আকৌ চেষ্টা কৰক।') : L('Not yet — watch the demo, then try again.', 'এতিয়াও হোৱা নাই — দেখুওৱাটো চাই আকৌ চেষ্টা কৰক।');
       result.replaceChildren(...[
@@ -213,7 +217,8 @@
         mode === 'free' ? h('p', { class: 'muted small' }, L('Your writing has been resized onto the letter to compare the shape.', 'আকাৰ মিলাবলৈ আপোনাৰ লিখা আখৰটোৰ ওপৰত মিলাই দেখুওৱা হৈছে।')) : null,
         h('div', { class: 'row left' },
           h('button', { class: 'btn sm gold', onclick: () => { reset(); paint(); } }, L('Write again', 'আকৌ লিখক')),
-          h('button', { class: 'btn sm', onclick: next }, L('Next →', 'পৰৱৰ্তী →')))].filter(Boolean));
+          fixed ? null : h('button', { class: 'btn sm', onclick: next }, L('Next →', 'পৰৱৰ্তী →')))].filter(Boolean));
+      ctx.onChecked && ctx.onChecked(grade);
       if (pct >= hi) burst(result);
       drawPicker();
     }
