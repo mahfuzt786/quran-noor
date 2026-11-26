@@ -13,7 +13,11 @@
 
   # Google sign-in opens a popup that reports back to this page; the site-wide "same-origin" cuts that link
   Header unset Cross-Origin-Opener-Policy
+  Header always unset Cross-Origin-Opener-Policy
   Header always set Cross-Origin-Opener-Policy "same-origin-allow-popups"
+  # cross-origin isolation is not needed here and gets in the way of Google's sign-in frame
+  Header unset Cross-Origin-Embedder-Policy
+  Header always unset Cross-Origin-Embedder-Policy
 
   # the page and the service worker must be re-checked on every visit so updates arrive; versioned files (?v=) can be cached long
   <FilesMatch "^(index\.html|sw\.js|manifest\.webmanifest)$">
