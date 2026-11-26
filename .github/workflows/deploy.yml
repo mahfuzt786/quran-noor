@@ -1,0 +1,68 @@
+# Deploys to https://smahfuzm.in/quran-noor/ on every push to main.
+# GitHub logs into the server over SSH and the server runs `git pull` in the site folder.
+# Setup (one time) is in .github/DEPLOY.md. Until the secrets exist this workflow does nothing and stays green.
+name: Deploy to smahfuzm.in
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:        # "Run workflow" button in the Actions tab
+
+concurrency:
+  group: deploy-smahfuzm
+  cancel-in-progress: false # never cut a pull off halfway; queue the next one instead
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+      SSH_PORT: ${{ secrets.SSH_PORT }}
+      SSH_KEY: ${{ secrets.SSH_KEY }}
+      SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+      SITE_URL: https://smahfuzm.in/quran-noor
+    steps:
+      - name: Check the deploy secrets
+        id: cfg
+        run: |
+          missing=""
+          for v in SSH_HOST SSH_USER SSH_KEY SSH_KNOWN_HOSTS; do [ -n "${!v}" ] || missing="$missing $v"; done
+          if [ -n "$missing" ]; then
+            echo "::warning::Deploy skipped — repository secrets not set:$missing (see .github/DEPLOY.md)"
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Pull the new version on the server
+        if: steps.cfg.outputs.ready == 'true'
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key && chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts && chmod 644 ~/.ssh/known_hosts
+          # The server's authorized_keys entry forces the pull command for this key, so the key can do nothing else.
+          ssh -i ~/.ssh/deploy_key -p "${SSH_PORT:-22}" \
+              -o StrictHostKeyChecking=yes -o BatchMode=yes -o ConnectTimeout=20 \
+              "$SSH_USER@$SSH_HOST" deploy
+
+      - name: Check the live site has this version
+        if: steps.cfg.outputs.ready == 'true'
+        run: |
+          want=$(curl -fsS "https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${GITHUB_SHA}/sw.js" | grep -o "VERSION = '[^']*'" | head -1)
+          echo "Expecting $want"
+          for i in $(seq 1 12); do
+            got=$(curl -fsS "$SITE_URL/sw.js?deploy=$GITHUB_RUN_ID-$i" | grep -o "VERSION = '[^']*'" | head -1 || true)
+            if [ "$got" = "$want" ]; then echo "Live site is on $got"; exit 0; fi
+            echo "Live site shows '$got', waiting…"; sleep 5
+          done
+          echo "::error::The server pulled, but $SITE_URL still serves '$got' instead of '$want'"
+          exit 1
+
+      - name: Remove the key from the runner
+        if: always()
+        run: rm -f ~/.ssh/deploy_key
