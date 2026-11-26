@@ -436,3 +436,13 @@ html[lang="en"] .lbl { font-family: Figtree, sans-serif; text-transform: upperca
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   html { scroll-behavior: auto; }
 }
+
+/* small phones: four nav icons, language switch and theme button must fit beside the logo */
+@media (max-width: 480px) {
+  .brand-name { display: none; }
+  .nav { gap: 0; }
+  .navlink { padding: 8px 7px; }
+  .icon-btn { width: 36px; height: 36px; }
+  .seg.lang button { padding: 5px 7px; font-size: 12.5px; }
+}
+@media (max-width: 340px) { .navlink { padding: 8px 5px; } .seg.lang { margin: 0; } }

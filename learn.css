@@ -309,3 +309,24 @@
 .bk-warn { padding: 10px 12px; border-radius: 10px; background: color-mix(in srgb, var(--warn) 14%, transparent); border: 1px solid var(--warn); font-size: 14.5px; }
 .bk-sec > .muted.small { margin-top: 10px; }
 @media (max-width: 760px) { .bk-card { grid-template-columns: 1fr; } }
+
+/* ============ offline & app ============ */
+#netbar { position: sticky; top: var(--hdr, 62px); z-index: 30; padding: 8px 16px; text-align: center; font-size: 14px; font-weight: 700; background: var(--warn); color: #261a00; }
+.upd-bar { position: fixed; left: 50%; translate: -50% 0; bottom: 96px; z-index: 75; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center;
+  padding: 10px 16px; border-radius: 16px; background: var(--card2); border: 1px solid var(--gold); box-shadow: var(--shadow-lg); width: max-content; max-width: calc(100vw - 32px); font-weight: 700; font-size: 14.5px; }
+.btn.off-btn.kept { border-color: var(--ok); color: var(--ok); }
+.off-opts { list-style: none; padding: 0; margin: 10px 0; display: grid; gap: 6px; }
+.off-total { font-weight: 700; margin: 4px 0 10px; }
+.off-prog { height: 10px; border-radius: 99px; background: var(--line); overflow: hidden; margin: 6px 0 12px; }
+.off-prog i { display: block; height: 100%; width: 0; background: var(--gold); border-radius: 99px; transition: width .2s; }
+.off-list { display: grid; gap: 8px; }
+.off-item { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.off-item a { margin-right: auto; color: var(--text); }
+.off-sec .inst-slot { margin-bottom: 14px; }
+.inst-slot:empty { display: none; }
+.inst-card { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 14px 16px; border-radius: var(--r-lg); background: var(--card); border: 1px solid var(--gold); }
+.inst-card img { border-radius: 12px; flex: none; }
+.inst-txt { flex: 1; min-width: 200px; display: grid; gap: 2px; }
+.inst-card.home { margin-bottom: 14px; }
+.inst-ok { font-weight: 700; color: var(--ok); }
+@media (max-width: 760px) { .upd-bar { bottom: 150px; } }

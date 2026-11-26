@@ -265,6 +265,8 @@
 
   function bindPlayer() {
     $('#pPlay').onclick = () => (P.playing ? pause() : play());
+    P.a.addEventListener('error', () => { if (!P.a.getAttribute('src')) return; if (P.playing) pause(); toast(t(navigator.onLine ? 'audio_err' : 'off_noaudio')); });
+    wordAudio.addEventListener('error', () => { if (wordAudio.getAttribute('src') && !navigator.onLine) toast(t('off_noword')); });
     $('#pPrev').onclick = () => play(Math.max(0, (P.vi < 0 ? 0 : P.vi) - 1));
     $('#pNext').onclick = () => play((P.vi < 0 ? -1 : P.vi) + 1);
     const step = (d) => { const i = SPEEDS.indexOf(P.rate); P.rate = SPEEDS[Math.max(0, Math.min(SPEEDS.length - 1, i + d))]; playerUI(); };
@@ -476,6 +478,7 @@
         hasProgress ? h('div', { class: 'stats' },
           [[S.streak.n || 0, t('st_streak')], [known, t('st_words')], [practiced, t('st_surahs')], [best || '—', t('st_pace')]]
             .map(([b, s], i) => h('div', { class: 'stat', style: `animation-delay:${i * 80}ms` }, h('b', {}, num(b)), h('span', {}, s)))) : null,
+        window.Offline ? window.Offline.installCard(true) : null,
         h('section', { class: 'sec' },
           h('div', { class: 'sec-title' }, h('h2', {}, t('how_title')), h('span', {}, t('how_sub'))),
           h('div', { class: 'method' }, [['ear', 'how1'], ['echo', 'how2'], ['fast', 'how3'], ['heart', 'how4']]
@@ -558,7 +561,8 @@
           h('h1', {}, sname(meta)), h('div', { class: 'sub mean' }, smean(meta)),
           h('div', { class: 'row left shead-act' },
             h('button', { class: 'btn gold', onclick: () => play(resume) }, h('span', { html: '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>' }), resume ? t('continue_v', resume + 1) : t('listen')),
-            resume ? h('button', { class: 'btn glass', onclick: () => { const el = verseEl(resume); el ? el.scrollIntoView({ block: 'center', behavior: 'smooth' }) : toast(t('v_loading')); } }, '↓ ' + num(resume + 1)) : null)),
+            resume ? h('button', { class: 'btn glass', onclick: () => { const el = verseEl(resume); el ? el.scrollIntoView({ block: 'center', behavior: 'smooth' }) : toast(t('v_loading')); } }, '↓ ' + num(resume + 1)) : null,
+            window.Offline && 'caches' in window ? window.Offline.surahButton(id, sname(meta)) : null)),
         h('div', { class: 'arname', lang: 'ar' }, meta.ar))),
       h('div', { class: 'wrap' },
         storyEl,
