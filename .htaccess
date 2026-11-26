@@ -13,6 +13,7 @@
 
   # the page and the service worker must be re-checked on every visit so updates arrive; versioned files (?v=) can be cached long
   <FilesMatch "^(index\.html|sw\.js|manifest\.webmanifest)$">
+    Header unset Cache-Control
     Header always set Cache-Control "no-cache"
   </FilesMatch>
 </IfModule>
