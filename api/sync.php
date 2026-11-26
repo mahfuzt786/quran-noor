@@ -5,6 +5,8 @@
 //   GET  ?a=me                          who is signed in (or 401)
 //   GET  ?a=data                        { data, rev }
 //   PUT  ?a=data    { data, rev }       save if rev still matches; otherwise 409 with the current copy
+//   GET  ?a=nonce                       one-time code for redirect sign-in (also set as a cookie)
+//   POST api/gsi.php                    Google sends the redirect sign-in here, then the page is reopened
 //   POST ?a=logout                      end this session
 //   POST ?a=delete                      delete the account's synced data and all its sessions
 //
@@ -19,10 +21,19 @@ header('Cache-Control: no-store');
 header('X-Content-Type-Options: nosniff');
 
 function out(int $code, array $body): void { http_response_code($code); echo json_encode($body, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); exit; }
-function fail(int $code, string $err): void { out($code, ['error' => $err]); }
+function fail(int $code, string $err): void {
+    if (defined('NOOR_GSI')) back_to_app('fail');        // redirect sign-in: return to the page, not JSON
+    out($code, ['error' => $err]);
+}
+function back_to_app(string $result): void {
+    header('Location: ' . cookie_path() . '?signin=' . $result . '#/progress', true, 303);
+    exit;
+}
 
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 $action = $_GET['a'] ?? '';
+
+if (defined('NOOR_GSI')) { gsi_return($cfg); }
 
 // only this site may call us
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
@@ -62,7 +73,38 @@ function verify_google(string $idToken, array $cfg): array {
     $okIss = in_array($t['iss'] ?? '', ['accounts.google.com', 'https://accounts.google.com'], true);
     if (!$okIss || ($t['aud'] ?? '') !== $cfg['google_client_id'] || (int)($t['exp'] ?? 0) < time() || empty($t['sub'])) fail(401, 'token');
     if (($t['email_verified'] ?? '') !== 'true' && ($t['email_verified'] ?? false) !== true) fail(401, 'email');
-    return ['sub' => (string)$t['sub'], 'email' => (string)($t['email'] ?? ''), 'name' => (string)($t['name'] ?? ''), 'picture' => (string)($t['picture'] ?? '')];
+    return ['sub' => (string)$t['sub'], 'email' => (string)($t['email'] ?? ''), 'name' => (string)($t['name'] ?? ''), 'picture' => (string)($t['picture'] ?? ''), 'nonce' => (string)($t['nonce'] ?? '')];
+}
+
+/** Save the user and start a session for them. */
+function start_session(array $g, array $cfg): void {
+    $pdo = db($cfg); $now = time();
+    $pdo->prepare('INSERT INTO users (sub, email, name, picture, created, seen) VALUES (?, ?, ?, ?, ?, ?)
+                   ON CONFLICT(sub) DO UPDATE SET email = excluded.email, name = excluded.name, picture = excluded.picture, seen = excluded.seen')
+        ->execute([$g['sub'], $g['email'], $g['name'], $g['picture'], $now, $now]);
+    $sid = bin2hex(random_bytes(32)); $exp = $now + $cfg['session_days'] * 86400;
+    $pdo->prepare('INSERT INTO sessions (hash, sub, created, expires) VALUES (?, ?, ?, ?)')->execute([hash('sha256', $sid), $g['sub'], $now, $exp]);
+    $pdo->prepare('DELETE FROM sessions WHERE expires < ?')->execute([$now]);
+    set_cookie($sid, $exp);
+}
+
+/* ---------- redirect sign-in ----------
+   The page asks for a one-time code (?a=nonce), which is also stored in a cookie only this browser has.
+   Google puts the code inside the signed sign-in token and posts it to api/gsi.php. A match proves the sign-in
+   was started from this browser, so another site cannot sign someone into a different account. */
+function nonce_cookie(string $value, int $expires): void {
+    setcookie('noor_nonce', $value, ['expires' => $expires, 'path' => cookie_path() . 'api/', 'secure' => true, 'httponly' => true, 'samesite' => 'None']);
+}
+function gsi_return(array $cfg): void {
+    if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') back_to_app('fail');
+    $csrfCookie = $_COOKIE['g_csrf_token'] ?? null;
+    if ($csrfCookie !== null && !hash_equals((string)$csrfCookie, (string)($_POST['g_csrf_token'] ?? ''))) back_to_app('fail');
+    $g = verify_google((string)($_POST['credential'] ?? ''), $cfg);
+    $nonce = (string)($_COOKIE['noor_nonce'] ?? '');
+    if (!preg_match('/^[a-f0-9]{32}$/', $nonce) || !hash_equals($nonce, $g['nonce'])) back_to_app('fail');
+    nonce_cookie('', 1);
+    start_session($g, $cfg);
+    back_to_app('ok');
 }
 
 /* ---------- sessions ---------- */
@@ -97,15 +139,14 @@ try {
     if ($action === 'login' && $method === 'POST') {
         $b = body($cfg);
         $g = verify_google((string)($b['credential'] ?? ''), $cfg);
-        $pdo = db($cfg); $now = time();
-        $pdo->prepare('INSERT INTO users (sub, email, name, picture, created, seen) VALUES (?, ?, ?, ?, ?, ?)
-                       ON CONFLICT(sub) DO UPDATE SET email = excluded.email, name = excluded.name, picture = excluded.picture, seen = excluded.seen')
-            ->execute([$g['sub'], $g['email'], $g['name'], $g['picture'], $now, $now]);
-        $sid = bin2hex(random_bytes(32)); $exp = $now + $cfg['session_days'] * 86400;
-        $pdo->prepare('INSERT INTO sessions (hash, sub, created, expires) VALUES (?, ?, ?, ?)')->execute([hash('sha256', $sid), $g['sub'], $now, $exp]);
-        $pdo->prepare('DELETE FROM sessions WHERE expires < ?')->execute([$now]);
-        set_cookie($sid, $exp);
+        start_session($g, $cfg);
         out(200, ['user' => public_user($g)]);
+    }
+
+    if ($action === 'nonce' && $method === 'GET') {
+        $n = bin2hex(random_bytes(16));
+        nonce_cookie($n, time() + 1800);
+        out(200, ['nonce' => $n]);
     }
 
     if ($action === 'me' && $method === 'GET') {

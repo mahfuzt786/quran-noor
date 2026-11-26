@@ -182,10 +182,19 @@
     notify(); N().toast(N().t('sy_signed_in', user.name || user.email));
     sync(false);
   }
+  // On the live site Google returns to api/gsi.php by a full-page redirect: popups can be cut off by browser
+  // settings, extensions and strict site headers. Elsewhere (local testing) the popup is used.
+  const REDIRECT = location.origin === 'https://smahfuzm.in';
   async function renderButton(el) {
     try {
       await loadGsi();
-      google.accounts.id.initialize({ client_id: CLIENT_ID, callback: onCredential, ux_mode: 'popup', use_fedcm_for_prompt: true, itp_support: true, context: 'signin' });
+      const opts = { client_id: CLIENT_ID, itp_support: true, context: 'signin' };
+      if (REDIRECT) {
+        const n = await api('nonce');
+        if (n.status !== 200 || !n.j.nonce) throw new Error(n.j.error || 'nonce');
+        Object.assign(opts, { ux_mode: 'redirect', login_uri: new URL('api/gsi.php', location.href).href, nonce: n.j.nonce });
+      } else Object.assign(opts, { ux_mode: 'popup', callback: onCredential });
+      google.accounts.id.initialize(opts);
       const night = document.documentElement.dataset.theme !== 'light';
       el.replaceChildren();
       google.accounts.id.renderButton(el, { type: 'standard', theme: night ? 'filled_black' : 'outline', size: 'large', shape: 'pill', text: 'signin_with', logo_alignment: 'left', locale: N().lang() === 'as' ? 'as' : 'en' });
@@ -250,7 +259,22 @@
   }
 
   /* ---------- when to sync ---------- */
+  // back from Google's redirect sign-in: the server has started a session, so ask who it is
+  async function returnFromGoogle() {
+    const u = new URL(location.href), r = u.searchParams.get('signin');
+    if (!r) return false;
+    u.searchParams.delete('signin'); history.replaceState(history.state, '', u.pathname + u.search + u.hash);
+    if (r !== 'ok') { N().toast(N().t('sy_err_login')); return true; }
+    const me = await api('me').catch(() => null);
+    if (!me || me.status !== 200) { N().toast(N().t('sy_err_login')); return true; }
+    user = me.j.user; N().store.set('syncUser', user); N().store.set('syncBase', null);
+    notify(); N().toast(N().t('sy_signed_in', user.name || user.email));
+    sync(false);
+    return true;
+  }
+
   async function start() {
+    if (await returnFromGoogle()) return;
     if (!user) return;
     const me = await api('me').catch(() => null);
     if (!me) return;                                   // offline: try again when back online
