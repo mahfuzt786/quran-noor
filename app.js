@@ -436,7 +436,7 @@
   const isDone = (id) => { const p = S.prog[id]; return !!(p && (p.quiz >= 70 || p.listened)); };
   const footer = () => h('footer', { class: 'foot' },
     h('div', { class: 'foot-orn', 'aria-hidden': 'true' }, '۞'),
-    h('p', {}, t('foot')), h('p', { class: 'muted small' }, t('foot_credit')));
+    h('p', {}, t('foot')), h('p', { class: 'muted small' }, t('foot_credit')), h('p', { class: 'muted small' }, h('a', { href: 'privacy.html' }, t('sy_privacy_link'))));
 
   function viewHome() {
     document.title = t('title');
@@ -654,6 +654,8 @@
     route().then(() => window.scrollTo(0, keep));
   });
   window.Noor = { h, $, $$, sayWord, shuffle, openModal, closeModal, burst, store, touchDay, t, num, lang: () => S.lang, footer,
+    // after another device's progress is merged in, re-read what the app keeps in memory
+    reloadState: () => { S.prog = store.get('prog', {}); S.known = store.get('known', {}); S.last = store.get('last', null); S.streak = store.get('streak', { day: '', n: 0 }); },
     surah: (id) => loadSurah(id).then(raw => ({ raw, verses: shapeVerses(id, raw, S.set.wbw) })),
     cur: () => S.cur, verseEl, pause, playOne, log: logPractice, chapters: () => S.chapters, sname, toast };
   applyTheme(); bindPlayer();

@@ -153,7 +153,7 @@
         h('span', { class: 'chip' }, t('pg_drill_pron') + ': ' + num(store.get('pronQuiz', 0) + '/10')),
         h('a', { class: 'chip', href: '#/learn' }, t('nav_learn') + ' →')));
 
-    const reset = () => openModal(h('h2', {}, t('pg_reset_t')), h('p', {}, t('pg_reset_d')),
+    const reset = () => openModal(h('h2', {}, t('pg_reset_t')), h('p', {}, t('pg_reset_d')), window.Sync?.signedIn() ? h('p', { class: 'bk-warn' }, t('sy_reset_note')) : null,
       h('div', { class: 'row' },
         h('button', { class: 'btn danger', onclick: () => { ['rc', 'write', 'pron', 'log', 'pronQuiz', 'letterQuiz', 'prog', 'known', 'streak', 'last'].forEach(k => { try { localStorage.removeItem('noor.' + k); } catch { /* ignore */ } }); closeModal(); location.reload(); } }, t('pg_reset_ok')),
         h('button', { class: 'btn', onclick: closeModal }, t('rc_cancel'))));
@@ -169,6 +169,7 @@
           h('div', { class: 'pg-foot' }, h('p', { class: 'muted small' }, t('pg_device_note')), h('button', { class: 'btn sm', onclick: reset }, t('pg_reset')))]
           : h('div', { class: 'endcard pg-empty' }, h('h3', {}, t('pg_empty_t')), h('p', {}, t('pg_empty')),
             h('div', { class: 'row' }, h('a', { class: 'btn gold', href: '#/s/1' }, t('pg_go_surah')), h('a', { class: 'btn', href: '#/learn' }, t('nav_learn')))),
+        window.Sync ? window.Sync.section() : null,
         window.Offline ? window.Offline.section() : null,
         window.Backup ? window.Backup.section() : null,
         footer()));

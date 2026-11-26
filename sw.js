@@ -3,7 +3,7 @@
    - Quran text (data/) and fonts are kept once fetched.
    - Word sounds are kept once played. Full-surah recitations are kept only when the user downloads them.
    Bump VERSION together with the ?v= numbers in index.html on every deploy. */
-const VERSION = 'v46';
+const VERSION = 'v47';
 const SHELL = 'noor-shell-' + VERSION;
 const DATA = 'noor-data-1';      // same name app.js uses for the surah files
 const FONTS = 'noor-fonts-1';
@@ -102,7 +102,7 @@ self.addEventListener('fetch', (e) => {
   if (req.mode === 'navigate' && url.origin === location.origin) return e.respondWith(page(req));
   if (url.origin === location.origin) {
     if (url.pathname.includes('/data/')) return e.respondWith(cacheFirst(DATA, req));
-    if (url.pathname.endsWith('/sw.js')) return;
+    if (url.pathname.endsWith('/sw.js') || url.pathname.includes('/api/')) return;   // sync requests always go to the server
     return e.respondWith(caches.match(req, { ignoreVary: true }).then(hit => hit || fetch(req).then(res => {
       if (res.ok && res.status === 200 && url.search.includes('v=')) caches.open(SHELL).then(c => c.put(req, res.clone()));
       return res;

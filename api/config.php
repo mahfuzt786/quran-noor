@@ -1,0 +1,14 @@
+<?php
+// Settings for the progress-sync endpoint. Server-specific overrides go in config.local.php (not in git).
+// This file prints nothing if opened in a browser, and api/.htaccess blocks it anyway.
+
+return array_merge([
+    // Google OAuth web client (public by design — it is also in the page).
+    'google_client_id' => '229303568022-f1ac5svku961mpbs7ovioliavfrfvn71.apps.googleusercontent.com',
+    // SQLite file. Must be outside the web folder and writable by the web server user.
+    'db_path' => getenv('NOOR_SYNC_DB') ?: '/var/lib/noor-sync/noor.sqlite',
+    // Pages allowed to call the endpoint.
+    'origins' => ['https://smahfuzm.in', 'http://localhost', 'http://localhost:4195'],
+    'session_days' => 180,
+    'max_bytes' => 2 * 1024 * 1024,
+], is_file(__DIR__ . '/config.local.php') ? (require __DIR__ . '/config.local.php') : []);

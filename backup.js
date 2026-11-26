@@ -14,7 +14,7 @@
     try {
       for (let i = 0; i < localStorage.length; i++) {
         const k = localStorage.key(i);
-        if (k && k.startsWith(PREFIX) && k !== PREFIX + 'lastBackup') data[k] = localStorage.getItem(k);
+        if (k && k.startsWith(PREFIX) && k !== PREFIX + 'lastBackup' && !k.startsWith(PREFIX + 'sync')) data[k] = localStorage.getItem(k);
       }
     } catch { /* storage unavailable */ }
     return data;
@@ -65,8 +65,9 @@
 
   /** Replaces everything in this browser with the backup. */
   async function apply(b) {
-    try { Object.keys(localStorage).filter(k => k.startsWith(PREFIX) && k !== PREFIX + 'lastBackup').forEach(k => localStorage.removeItem(k)); } catch { /* ignore */ }
-    for (const [k, v] of Object.entries(b.data)) { try { localStorage.setItem(k, v); } catch { throw new Error('bk_full'); } }
+    const keep = (k) => k === PREFIX + 'lastBackup' || k.startsWith(PREFIX + 'sync');
+    try { Object.keys(localStorage).filter(k => k.startsWith(PREFIX) && !keep(k)).forEach(k => localStorage.removeItem(k)); } catch { /* ignore */ }
+    for (const [k, v] of Object.entries(b.data)) { if (keep(k)) continue; try { localStorage.setItem(k, v); } catch { throw new Error('bk_full'); } }
     if (window.Recite?.voice) {
       await window.Recite.voice.clear();
       for (const r of b.voice) {
