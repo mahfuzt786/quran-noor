@@ -563,6 +563,7 @@
           h('div', { class: 'row left shead-act' },
             h('button', { class: 'btn gold', onclick: () => play(resume) }, h('span', { html: '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>' }), resume ? t('continue_v', resume + 1) : t('listen')),
             resume ? h('button', { class: 'btn glass', onclick: () => { const el = verseEl(resume); el ? el.scrollIntoView({ block: 'center', behavior: 'smooth' }) : toast(t('v_loading')); } }, '↓ ' + num(resume + 1)) : null,
+            h('a', { class: 'btn glass', href: '#/hifz/' + id }, '🧠 ' + t('hz_btn')),
             window.Offline && 'caches' in window ? window.Offline.surahButton(id, sname(meta)) : null)),
         h('div', { class: 'arname', lang: 'ar' }, meta.ar))),
       h('div', { class: 'wrap' },
@@ -639,6 +640,8 @@
     if (m) return viewSurah(Math.min(114, Math.max(1, +m[1])), m[2] ? +m[2] : 0);
     stopAll(); stopTimer(false); S.cur = null; S.token++;
     if (location.hash.startsWith('#/progress')) { document.title = t('nav_progress') + (S.lang === 'as' ? ' · নূৰ' : ' · Noor'); $('#player').hidden = true; window.Progress.view($('#app')); window.scrollTo(0, 0); return; }
+    const hz = location.hash.match(/^#\/hifz(?:\/(\d+)(?:\/(\d+))?)?/);
+    if (hz) { document.title = t('hz_title') + (S.lang === 'as' ? ' · নূৰ' : ' · Noor'); $('#player').hidden = true; window.scrollTo(0, 0); return window.Hifz.view($('#app'), hz[1] ? Math.min(114, Math.max(1, +hz[1])) : 0, hz[2] ? +hz[2] : 0); }
     if (location.hash.startsWith('#/review')) { document.title = t('rv_title') + (S.lang === 'as' ? ' · নূৰ' : ' · Noor'); $('#player').hidden = true; window.Review.view($('#app')); window.scrollTo(0, 0); return; }
     if (location.hash.startsWith('#/saved')) { document.title = t('bm_title') + (S.lang === 'as' ? ' · নূৰ' : ' · Noor'); $('#player').hidden = true; window.Bookmarks.view($('#app')); window.scrollTo(0, 0); return; }
     if (location.hash.startsWith('#/learn')) { document.title = t('nav_learn') + (S.lang === 'as' ? ' · নূৰ' : ' · Noor'); $('#player').hidden = true; window.Learn.view($('#app')); window.scrollTo(0, 0); return; }

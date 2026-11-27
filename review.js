@@ -16,7 +16,7 @@
   const fresh = () => ({ due: today(), iv: 0, ease: 2.3, reps: 0, lapses: 0, added: today() });
 
   /** Put an item up for review today, if it is not scheduled already. */
-  function add(id) { const m = all(); if (!m[id]) { m[id] = fresh(); save(m); } }
+  function add(id, inDays = 0) { const m = all(); if (!m[id]) { m[id] = fresh(); if (inDays) m[id].due = addDays(today(), inDays); save(m); } }
   function drop(id) { const m = all(); delete m[id]; save(m); }
 
   /**
@@ -38,7 +38,8 @@
     return it;
   }
 
-  const kindOf = (id) => id[0] === 'v' ? 'v' : id[0] === 'p' ? 'p' : 'w';
+  // 'm:' is a memorised verse: reviewed with the words hidden
+  const kindOf = (id) => id[0] === 'v' || id[0] === 'm' ? 'v' : id[0] === 'p' ? 'p' : 'w';
   const order = { v: 0, p: 1, w: 2 };
   function dueList() {
     const m = all(), d = today();
@@ -130,7 +131,13 @@
     const vv = verses[v - 1]; if (!vv) throw new Error('missing');
     const words = vv.w.filter(w => !w.end);
     const AS = lang() === 'as';
-    const wordEls = words.map(w => h('button', { class: 'w', onclick: () => sayWord(w) }, h('span', { class: 'ar' }, w.t), h('span', { class: 'pa', lang: 'as' }, window.AsPron.word(w.t))));
+    const memory = id[0] === 'm';
+    const wordEls = words.map(w => {
+      const el = h('button', { class: 'w' + (memory ? ' hz-w hz-hidden' : '') }, h('span', { class: 'ar' }, w.t), h('span', { class: 'hz-cover', 'aria-hidden': 'true' }), memory ? null : h('span', { class: 'pa', lang: AS ? 'as' : 'en' }, AS ? window.AsPron.word(w.t) : (w.tr || '')));
+      if (memory) el.style.setProperty('--len', Math.max(2, [...w.t].filter(c => !/[\u064B-\u065F\u0670\u06D6-\u06ED]/.test(c)).length));
+      el.onclick = () => { if (el.classList.contains('hz-hidden')) { el.classList.add('peek'); setTimeout(() => el.classList.remove('peek'), 1600); } else sayWord(w); };
+      return el;
+    });
     const meaning = h('p', { class: 'rv-mn', lang: AS ? 'as' : 'en', hidden: true }, AS ? vv.as : vv.en);
     const out = h('div', { class: 'rv-out', 'aria-live': 'polite' });
     const seg = raw.a[1][v - 1];
@@ -140,6 +147,7 @@
     function check() {
       window.Recite.ensureReady(() => {
         wordEls.forEach(el => { el.classList.remove('rc-ok', 'rc-close', 'rc-wrong', 'rc-missed'); el.querySelector('.rc-pct')?.remove(); });
+        if (memory) wordEls.forEach(el => el.classList.add('hz-hidden'));
         const live = h('span', { class: 'rc-live-sm', dir: 'rtl', lang: 'ar' });
         let ctl;
         out.replaceChildren(h('div', { class: 'lp-listen' }, h('span', { class: 'rc-dot', 'aria-hidden': 'true' }), h('b', {}, t('rc_listen')), live,
@@ -151,7 +159,7 @@
             if (!text) { out.replaceChildren(h('p', { class: 'lp-bad' }, t(error === 'not-allowed' || error === 'service-not-allowed' ? 'rc_denied' : error === 'network' ? 'rc_net' : 'rc_none')), selfGrade(graded)); return; }
             const r = window.ReciteCore.compare(words.map(w => w.t), text);
             const pct = (x) => num(Math.round(x * 100)) + '%';
-            r.words.forEach((res, k) => { wordEls[k].classList.add('rc-' + res.status); wordEls[k].append(h('span', { class: 'rc-pct' }, pct(res.s))); });
+            r.words.forEach((res, k) => { wordEls[k].classList.remove('hz-hidden'); wordEls[k].classList.add('rc-' + res.status); wordEls[k].append(h('span', { class: 'rc-pct' }, pct(res.s))); });
             const bestAll = store.get('rc', {}); bestAll[vv.key] = Math.max(bestAll[vv.key] || 0, Math.round(r.score * 100)); store.set('rc', bestAll);
             N().log('rc', r.score * 100); N().touchDay();
             const g = r.score === 1 ? 'good' : r.score >= .7 ? 'hard' : 'again';
@@ -170,10 +178,10 @@
 
     return h('article', { class: 'rv-card' },
       h('div', { class: 'rv-head' },
-        h('span', { class: 'chip rv-kind' }, '📖 ' + t('rv_k_v')),
+        h('span', { class: 'chip rv-kind' }, memory ? '🧠 ' + t('rv_k_m') : '📖 ' + t('rv_k_v')),
         h('a', { class: 'rv-ref', href: `#/s/${s}/${v}` }, h('b', {}, sname(chapters()[s - 1])), ' ', h('span', { class: 'muted' }, num(vv.key))),
         best != null ? h('span', { class: 'muted small' }, t('bm_best', num(best) + '%')) : null),
-      h('p', { class: 'muted small' }, t('rv_v_task')),
+      h('p', { class: 'muted small' }, t(memory ? 'rv_m_task' : 'rv_v_task')),
       h('div', { class: 'words rv-words', dir: 'rtl', lang: 'ar' }, wordEls),
       meaning,
       h('div', { class: 'row left' },
@@ -181,7 +189,7 @@
         seg ? h('button', { class: 'btn', onclick: () => playSegment(raw.a[0], seg[0], seg[1]) }, h('span', { html: window.Recite.icons.speaker }), t('rc_listen_v')) : null,
         h('button', { class: 'btn', onclick: () => { meaning.hidden = !meaning.hidden; } }, t('rv_meaning'))),
       out,
-      window.Recite.supported() ? null : selfGrade(graded));
+      window.Recite.supported() ? null : selfGrade((g) => { wordEls.forEach(el => el.classList.remove('hz-hidden')); graded(g); }));
   }
 
   function letterCard(id, finish) {

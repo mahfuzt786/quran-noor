@@ -164,6 +164,7 @@
       h('div', { class: 'wrap' },
         window.Goals ? window.Goals.section() : null,
         window.Review ? window.Review.section() : null,
+        window.Hifz ? window.Hifz.section() : null,
         window.Bookmarks ? window.Bookmarks.progressSection() : null,
         hasAny ? [tiles, activity, recitation, writing, speaking,
           h('div', { class: 'pg-foot' }, h('p', { class: 'muted small' }, t('pg_device_note')), h('button', { class: 'btn sm', onclick: reset }, t('pg_reset')))]

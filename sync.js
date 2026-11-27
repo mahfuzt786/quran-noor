@@ -16,7 +16,7 @@
     pronQuiz: 'max', letterQuiz: 'max', srsInit: 'max',
     log: 'log',
     pron: 'items', prog: 'items', srs: 'items', bm: 'list',
-    streak: 'streak', last: 'whole', goal: 'whole', goalMet: 'whole'
+    streak: 'streak', last: 'whole', goal: 'whole', goalMet: 'whole', hifz: 'items'
   };
   const KEYS = Object.keys(RULES);
   const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -29,7 +29,7 @@
     if (l === undefined) return r; if (r === undefined) return l;
     if (k === 'srs') return (l.last || '') > (r.last || '') ? l : (r.last || '') > (l.last || '') ? r : (l.reps >= r.reps ? l : r);
     if (k === 'pron') return { ...(l.n >= r.n ? l : r), ok: MAX(l.ok, r.ok), n: MAX(l.n, r.n) };
-    if (k === 'prog') return deepMax(l, r);
+    if (k === 'prog' || k === 'hifz') return deepMax(l, r);   // memorised steps only go up
     return l;
   }
   function deepMax(a, b) {
