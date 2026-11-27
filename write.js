@@ -120,7 +120,7 @@
     if (fixed) { kind = 'letter'; li = ctx.fixedLetter; }
     let strokes = [], checked = null, demoT = null;
     const best = store.get('write', {});
-    const item = () => kind === 'letter' ? { text: forms(LET[li][0], LET[li][5])[fi], id: 'l' + li + '.' + fi, name: LET[li][1], ex: D.ex[LET[li][0]] } : { text: WORDS[wi][0], id: 'w' + wi, name: WORDS[wi][1], mean: WORDS[wi][2] };
+    const item = () => kind === 'letter' ? { text: forms(LET[li][0], LET[li][5])[fi], id: 'l' + li + '.' + fi, name: window.Learn.nameOf ? window.Learn.nameOf(LET[li]) : LET[li][1], ex: D.ex[LET[li][0]] } : { text: WORDS[wi][0], id: 'w' + wi, name: WORDS[wi][1], mean: WORDS[wi][2] };
 
     const canvas = h('canvas', { class: 'wpad', 'aria-label': L('Writing area', 'লিখাৰ ঠাই') });
     const target = h('div', { class: 'wtarget' });

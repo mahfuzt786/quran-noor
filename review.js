@@ -195,12 +195,12 @@
     let lastGrade = 'good';
     const after = (g) => { lastGrade = g; const it = window.Review.all()[id]; next.hidden = false; next.querySelector('.rv-when')?.remove(); if (it) next.prepend(h('span', { class: 'muted small rv-when' }, t('rv_next_on', whenText(it)))); };
     const head = h('div', { class: 'rv-head' }, h('span', { class: 'chip rv-kind' }, kind === 'p' ? '🎤 ' + t('rv_k_p') : '✍ ' + t('rv_k_w')),
-      h('b', { class: 'rv-letter', lang: 'ar' }, X[0]), h('span', {}, X[1] + ' · ' + X[2]));
+      h('b', { class: 'rv-letter', lang: 'ar' }, X[0]), h('span', {}, window.Learn.nameOf(X) + ' · ' + (AS ? X[2] : X[3])));
     if (kind === 'p') {
       const box = window.LetterCheck.box({ h, L, num, X, LET, sayWord, ex, AS, onResult: (ok) => { if (ok == null) return; after(ok ? 'good' : 'again'); } });
       return h('article', { class: 'rv-card' }, head, h('p', { class: 'muted small' }, t('rv_p_task')),
         h('div', { class: 'row left' },
-          h('button', { class: 'btn sm gold', onclick: () => window.Learn.sayLetter(idx, 'name') }, '🔊 ' + X[1]),
+          h('button', { class: 'btn sm gold', onclick: () => window.Learn.sayLetter(idx, 'name') }, '🔊 ' + window.Learn.nameOf(X)),
           ex ? h('button', { class: 'btn sm', onclick: () => sayWord(ex) }, '🔊 ' + t('rv_hear_ex'), ' ', h('span', { class: 'ar', lang: 'ar' }, ex.t)) : null),
         window.Recite.supported() ? box : selfGrade((g) => { window.Review.result(id, g); finish(g); }), next);
     }

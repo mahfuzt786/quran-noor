@@ -71,6 +71,7 @@
     return error === 'not-allowed' || error === 'service-not-allowed' ? t('rc_denied') : error === 'audio-capture' ? t('rc_nomic') : error === 'network' ? t('rc_net') : t('rc_none');
   }
   const nameOf = (LET, ch) => LET.find(r => r[0] === ch);
+  const nm = (X) => window.Learn && window.Learn.nameOf ? window.Learn.nameOf(X) : X[1];   // name in the chosen language
 
   function checkName(ctx, res, onResult) {
     const { h, L } = ctx;
@@ -103,11 +104,11 @@
     const again = h('button', { class: 'btn sm gold', onclick: () => checkName(ctx, res, ctx.onResult) }, h('span', { html: window.Recite.icons.mic }), L('Try again', 'আকৌ কওক'));
     const heard = id.heard ? h('span', { class: 'muted small' }, L('Heard: ', 'শুনা গ’ল: '), h('span', { class: 'ar', lang: 'ar', dir: 'rtl' }, id.heard)) : null;
     if (ok) {
-      res.replaceChildren(h('div', { class: 'lp-ok' }, h('b', {}, '✓ ' + L('Correct!', 'শুদ্ধ!')), ' ', L('You said the name of ', 'আপুনি শুদ্ধকৈ কৈছে: '), h('span', { class: 'ar', lang: 'ar' }, target[0]), ' (' + target[1] + ')'), heard ? h('p', {}, heard) : null, h('div', { class: 'row left' }, hear));
+      res.replaceChildren(h('div', { class: 'lp-ok' }, h('b', {}, '✓ ' + L('Correct!', 'শুদ্ধ!')), ' ', L('You said the name of ', 'আপুনি শুদ্ধকৈ কৈছে: '), h('span', { class: 'ar', lang: 'ar' }, target[0]), ' (' + nm(target) + ')'), heard ? h('p', {}, heard) : null, h('div', { class: 'row left' }, hear));
     } else if (other) {
       res.replaceChildren(
-        h('div', { class: 'lp-bad' }, h('b', {}, '✗ '), L('It sounded like ', 'আপোনাৰ উচ্চাৰণ এইটোৰ দৰে শুনা গ’ল: '), h('span', { class: 'ar', lang: 'ar' }, other[0]), ' (' + other[1] + ')',
-          L(' — the letter shown is ', ' — দেখুওৱা আখৰটো হ’ল '), h('span', { class: 'ar', lang: 'ar' }, target[0]), ' (' + target[1] + ')।'),
+        h('div', { class: 'lp-bad' }, h('b', {}, '✗ '), L('It sounded like ', 'আপোনাৰ উচ্চাৰণ এইটোৰ দৰে শুনা গ’ল: '), h('span', { class: 'ar', lang: 'ar' }, other[0]), ' (' + nm(other) + ')',
+          L(' — the letter shown is ', ' — দেখুওৱা আখৰটো হ’ল '), h('span', { class: 'ar', lang: 'ar' }, target[0]), ' (' + nm(target) + ')' + L('.', '।')),
         h('p', { class: 'lp-tip' }, h('b', {}, L('How to say it: ', 'কেনেকৈ ক’ব: ')), ctx.AS ? target[6] : target[4]),
         heard ? h('p', {}, heard) : null,
         h('div', { class: 'row left' }, hear, again));

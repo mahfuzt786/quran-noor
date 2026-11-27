@@ -8,8 +8,9 @@
 .lcell:hover { transform: translateY(-3px) scale(1.04); border-color: var(--gold); }
 .lcell.on { background: var(--gold); border-color: transparent; }
 .lcell.on .ar, .lcell.on small { color: var(--gold-ink); }
-.lcell .ar { font-size: 32px; line-height: 2.1; }
-.lcell small { font: 600 12.5px "Noto Sans Bengali", sans-serif; color: var(--muted); }
+.lcell .ar { font-size: 32px; line-height: 1.9; }
+.lcell small { font: 600 19px/1.2 "Noto Sans Bengali", Figtree, sans-serif; color: var(--muted); white-space: nowrap; }
+.lcell small:lang(en) { font-family: Figtree, sans-serif; font-size: 18px; }
 .ldetail, .syll, .join, .panel { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 18px; }
 .ldetail { position: sticky; top: 130px; display: flex; gap: 16px; align-items: flex-start; }
 .pop { animation: pop .3s both; }
