@@ -199,7 +199,9 @@
     if (kind === 'p') {
       const box = window.LetterCheck.box({ h, L, num, X, LET, sayWord, ex, AS, onResult: (ok) => { if (ok == null) return; after(ok ? 'good' : 'again'); } });
       return h('article', { class: 'rv-card' }, head, h('p', { class: 'muted small' }, t('rv_p_task')),
-        ex ? h('button', { class: 'btn sm', onclick: () => sayWord(ex) }, '🔊 ' + t('rv_hear_ex'), ' ', h('span', { class: 'ar', lang: 'ar' }, ex.t)) : null,
+        h('div', { class: 'row left' },
+          h('button', { class: 'btn sm gold', onclick: () => window.Learn.sayLetter(idx, 'name') }, '🔊 ' + X[1]),
+          ex ? h('button', { class: 'btn sm', onclick: () => sayWord(ex) }, '🔊 ' + t('rv_hear_ex'), ' ', h('span', { class: 'ar', lang: 'ar' }, ex.t)) : null),
         window.Recite.supported() ? box : selfGrade((g) => { window.Review.result(id, g); finish(g); }), next);
     }
     const pad = h('div', { class: 'rv-write' });

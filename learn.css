@@ -388,3 +388,8 @@ body:has(#player:not([hidden])) .upd { bottom: calc(108px + env(safe-area-inset-
 .sy-who div { display: grid; }
 .sy-status { font-weight: 700; color: var(--ok); }
 .sy-status.err { color: var(--warn); }
+
+/* letter name / vowel buttons */
+.lsay { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 4px; }
+.lsay .ar { font: 26px/1.2 var(--quran); }
+.lsay small { color: inherit; opacity: .8; }

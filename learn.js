@@ -87,6 +87,23 @@
   const forms = (c, j) => [c, j ? c + ZWJ : c, ZWJ + c + (j ? ZWJ : ''), ZWJ + c];
   const clean = (m) => m.replace(/[()\[\]]/g, '').trim();
 
+  /* Letter names and vowel rows, recorded once with Google's Arabic voice and stored in audio/letters/.
+     name-NN: the letter's name (alif, ba, ta …). vowels-NN: the letter with fatha, kasra, damma (ba, bi, bu). */
+  const vowelsAs = (snd) => {
+    const raw = String(snd).split(/[ /,]/)[0], base = raw.replace(/[আা]$/, '');
+    if (!base) return 'আ, ই, উ';                          // alif carries the vowel itself
+    if (base.startsWith('‘')) return '‘আ, ‘ই, ‘উ';           // ain: the vowel from the throat
+    return `${base}, ${base}ি, ${base}ু`;
+  };
+  let letterAudio = null;
+  function sayLetter(i, kind = 'name') {
+    if (i < 0 || i >= LET.length) return;
+    if (!letterAudio) letterAudio = new Audio();
+    window.Noor?.pause && window.Noor.pause();
+    letterAudio.src = `audio/letters/${kind}-${String(i).padStart(2, '0')}.mp3`;
+    letterAudio.play().catch(() => { if (!navigator.onLine) window.Noor?.toast(window.Noor.t('off_noword')); });
+  }
+
   function view(app) {
     const { h, $, $$, sayWord, shuffle, openModal, closeModal, burst, store, touchDay } = window.Noor;
     const D = window.LESSON_DATA, P = window.AsPron;
@@ -104,7 +121,7 @@
     const tabLetters = () => {
       const detail = h('div', { class: 'ldetail' });
       const show = (X, btn) => {
-        const [c, name, snd, lat, tipEn, j, tipAs] = X, f = forms(c, j), ex = D.ex[c];
+        const [c, name, snd, lat, tipEn, j, tipAs] = X, f = forms(c, j), ex = D.ex[c], li = LET.indexOf(X);
         $$('.lcell', body).forEach(b => b.classList.toggle('on', b === btn));
         const fam = FAMILIES.find(g => g.includes(c));
         detail.replaceChildren(
@@ -115,15 +132,18 @@
             h('div', { class: 'forms' }, [L('Alone', 'অকলে'), L('Start', 'আৰম্ভণি'), L('Middle', 'মাজত'), L('End', 'শেষত')].map((lab, i) => h('div', {}, h('span', { class: 'ar', lang: 'ar' }, f[i]), h('small', {}, lab)))),
             j ? null : h('p', { class: 'muted' }, L('This letter never joins to the letter after it, so its “start” and “middle” shapes look like “alone” and “end”.', 'এই আখৰ পিছৰ আখৰৰ লগত কেতিয়াও জোৰা নালাগে; সেয়ে ইয়াৰ “আৰম্ভণি” আৰু “মাজত” ৰূপ “অকলে” আৰু “শেষত”-ৰ দৰেই।')),
             fam ? h('p', { class: 'muted' }, L('Same shape, different dots: ', 'একে ৰূপ, বেলেগ ফুট: '), h('span', { class: 'ar sm', lang: 'ar' }, fam.join('  '))) : null,
+            h('div', { class: 'lsay' },
+              h('button', { class: 'btn sm gold', onclick: () => sayLetter(li, 'name') }, '🔊 ', L('Name: ', 'নাম: '), h('b', { lang: 'as' }, name)),
+              h('button', { class: 'btn sm', onclick: () => sayLetter(li, 'vowels') }, '🔊 ', h('span', { class: 'ar', lang: 'ar', dir: 'rtl' }, `${c}َ  ${c}ِ  ${c}ُ`), ' ', h('small', { lang: 'as' }, vowelsAs(snd)))),
             ex ? h('div', { class: 'row left' }, wordCard(ex)) : null,
             window.LetterCheck ? window.LetterCheck.box({ h, L, num, X, LET, sayWord, ex, AS }) : null));
         detail.classList.remove('pop'); void detail.offsetWidth; detail.classList.add('pop');
-        if (ex && btn && btn.dataset.user) sayWord(ex);
+        if (btn && btn.dataset.user) sayLetter(li, 'name');
       };
       const grid = h('div', { class: 'lgrid', dir: 'rtl' }, LET.map(X => h('button', { class: 'lcell', onclick: (e) => { e.currentTarget.dataset.user = '1'; show(X, e.currentTarget); } }, h('span', { class: 'ar', lang: 'ar' }, X[0]), h('small', { lang: 'as' }, X[1]))));
       body.replaceChildren(
-        h('p', { class: 'lead' }, L('Arabic is read from right to left. It has 28 letters, and all of them are consonants — the vowels are small marks written above or below. Tap a letter to see its shapes and hear a Quran word that begins with it.',
-          'আৰবী সোঁফালৰ পৰা বাওঁফাললৈ পঢ়া হয়। ইয়াত 28টা আখৰ আছে আৰু সকলোবোৰ ব্যঞ্জনবৰ্ণ — স্বৰধ্বনিবোৰ আখৰৰ ওপৰত বা তলত লিখা সৰু সৰু চিন। এটা আখৰত টিপক; তাৰ ৰূপবোৰ চাওক আৰু সেই আখৰেৰে আৰম্ভ হোৱা কোৰআনৰ এটা শব্দ শুনক।')),
+        h('p', { class: 'lead' }, L('Arabic is read from right to left. It has 28 letters, and all of them are consonants — the vowels are small marks written above or below. Tap a letter to hear its name and see its shapes; the buttons play it with each short vowel and in a Quran word.',
+          'আৰবী সোঁফালৰ পৰা বাওঁফাললৈ পঢ়া হয়। ইয়াত 28টা আখৰ আছে আৰু সকলোবোৰ ব্যঞ্জনবৰ্ণ — স্বৰধ্বনিবোৰ আখৰৰ ওপৰত বা তলত লিখা সৰু সৰু চিন। এটা আখৰত টিপক — আখৰটোৰ নাম শুনিব আৰু ৰূপবোৰ দেখিব; বুটামবোৰে প্ৰতিটো হ্ৰস্ব স্বৰৰ সৈতে আৰু কোৰআনৰ এটা শব্দত শুনায়।')),
         h('div', { class: 'lsplit' }, grid, detail));
       show(LET[1], $$('.lcell', body)[1]);
     };
@@ -251,5 +271,5 @@
     $$('.ltab', tabs)[Math.min(store.get('learnTab', 0), TABS.length - 1)].click();
   }
 
-  window.Learn = { view, LET, forms };
+  window.Learn = { view, LET, forms, sayLetter };
 })();
