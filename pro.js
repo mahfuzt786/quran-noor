@@ -96,16 +96,24 @@
       h('div', { class: 'row left' }, h('button', { class: 'btn sm gold', onclick: offer }, t('pr_title') + ' →'), h('button', { class: 'btn sm', onclick: onSkip }, t('pr_skip'))));
   }
 
-  /* back from the Razorpay page (?paid=1): wait for the webhook to confirm */
+  /* back from the Razorpay page (?paid=1, plus razorpay_payment_id=… that Razorpay adds): open Progress,
+     then wait for the webhook to confirm — claiming by the payment ID as well, in case the emails differ */
   async function returnFromPayment() {
     const u = new URL(location.href);
-    if (!u.searchParams.has('paid')) return;
-    u.searchParams.delete('paid'); history.replaceState(history.state, '', u.pathname + u.search + u.hash);
+    if (!u.searchParams.has('paid') && !u.searchParams.has('razorpay_payment_id')) return;
+    const pid = u.searchParams.get('razorpay_payment_id') || '';
+    [...u.searchParams.keys()].filter(k => k === 'paid' || k.startsWith('razorpay_')).forEach(k => u.searchParams.delete(k));
+    history.replaceState(history.state, '', u.pathname + u.search + (u.hash && u.hash !== '#/' ? u.hash : '#/progress'));
+    if (location.hash === '#/progress') window.dispatchEvent(new HashChangeEvent('hashchange'));
     if (!N().store.get('syncUser', null)) return;
     N().toast(N().t('pr_waiting'));
     for (let i = 0; i < 30; i++) {
       const r = await api('me').catch(() => null);
       if (r && r.status === 200) { setUser(r.j.user); if (r.j.user.pro) return; }
+      if (/^pay_[A-Za-z0-9]{8,30}$/.test(pid)) {
+        const c = await api('claim', 'POST', { payment_id: pid }).catch(() => null);
+        if (c && c.status === 200) { setUser(c.j.user); if (c.j.user.pro) return; }
+      }
       await new Promise(res => setTimeout(res, 3000));
     }
     N().toast(N().t('pr_wait_long'));
