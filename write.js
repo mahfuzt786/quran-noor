@@ -7,8 +7,12 @@
   const FONT = '"Amiri Quran", "Scheherazade New", serif';
   const ZWJ = '‍';
   // short words written without vowel marks, for joining practice
-  const WORDS = [['بسم', 'বিছমি', 'নামত'], ['الله', 'আল্লাহ', 'আল্লাহ'], ['رب', 'ৰাব্ব', 'প্ৰতিপালক'], ['قل', 'ক্বুল', 'কোৱা'], ['هو', 'হুৱা', 'তেওঁ'],
-    ['احد', 'আহাদ', 'এক'], ['نور', 'নূৰ', 'পোহৰ'], ['كتاب', 'কিতাব', 'কিতাপ'], ['صلاة', 'ছালাত', 'নামাজ'], ['سلام', 'ছালাম', 'শান্তি']];
+  // [Arabic, Assamese reading, Assamese meaning, English reading, English meaning]
+  const WORDS = [['بسم', 'বিছমি', 'নামত', 'bismi', 'in the name'], ['الله', 'আল্লাহ', 'আল্লাহ', 'Allāh', 'Allah'], ['رب', 'ৰাব্ব', 'প্ৰতিপালক', 'rabb', 'Lord'],
+    ['قل', 'ক্বুল', 'কোৱা', 'qul', 'say'], ['هو', 'হুৱা', 'তেওঁ', 'huwa', 'he'], ['احد', 'আহাদ', 'এক', 'aḥad', 'one'], ['نور', 'নূৰ', 'পোহৰ', 'nūr', 'light'],
+    ['كتاب', 'কিতাব', 'কিতাপ', 'kitāb', 'book'], ['صلاة', 'ছালাত', 'নামাজ', 'ṣalāh', 'prayer'], ['سلام', 'ছালাম', 'শান্তি', 'salām', 'peace']];
+  const EN = () => window.Noor && window.Noor.lang() === 'en';
+  const wName = (w) => EN() ? w[3] : w[1], wMean = (w) => EN() ? w[4] : w[2];
 
   function layout(ctx, text, S) {
     ctx.direction = 'rtl'; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
@@ -120,7 +124,7 @@
     if (fixed) { kind = 'letter'; li = ctx.fixedLetter; }
     let strokes = [], checked = null, demoT = null;
     const best = store.get('write', {});
-    const item = () => kind === 'letter' ? { text: forms(LET[li][0], LET[li][5])[fi], id: 'l' + li + '.' + fi, name: window.Learn.nameOf ? window.Learn.nameOf(LET[li]) : LET[li][1], ex: D.ex[LET[li][0]] } : { text: WORDS[wi][0], id: 'w' + wi, name: WORDS[wi][1], mean: WORDS[wi][2] };
+    const item = () => kind === 'letter' ? { text: forms(LET[li][0], LET[li][5])[fi], id: 'l' + li + '.' + fi, name: window.Learn.nameOf ? window.Learn.nameOf(LET[li]) : LET[li][1], ex: D.ex[LET[li][0]] } : { text: WORDS[wi][0], id: 'w' + wi, name: wName(WORDS[wi]), mean: wMean(WORDS[wi]) };
 
     const canvas = h('canvas', { class: 'wpad', 'aria-label': L('Writing area', 'লিখাৰ ঠাই') });
     const target = h('div', { class: 'wtarget' });
@@ -141,7 +145,7 @@
           fixed ? null : h('div', { class: 'wletters', dir: 'rtl' }, LET.map((X, i) => h('button', { class: 'chip arc' + (i === li ? ' on' : '') + ((best['l' + i + '.0'] || 0) >= 70 ? ' done' : ''), lang: 'ar', 'aria-label': X[1], onclick: () => { li = i; fi = 0; store.set('wLetter', i); reset(); drawAll(); } }, X[0]))),
           h('div', { class: 'row left' }, [L('Alone', 'অকলে'), L('Start', 'আৰম্ভণি'), L('Middle', 'মাজত'), L('End', 'শেষত')].map((lab, i) => h('button', { class: 'chip' + (i === fi ? ' on' : ''), onclick: () => { fi = i; reset(); drawAll(); } }, lab))));
       } else {
-        picker.replaceChildren(h('div', { class: 'row left' }, WORDS.map((w, i) => h('button', { class: 'chip' + (i === wi ? ' on' : '') + ((best['w' + i] || 0) >= 70 ? ' done' : ''), onclick: () => { wi = i; reset(); drawAll(); } }, h('span', { class: 'ar', lang: 'ar' }, w[0]), ' ' + w[1]))));
+        picker.replaceChildren(h('div', { class: 'row left' }, WORDS.map((w, i) => h('button', { class: 'chip' + (i === wi ? ' on' : '') + ((best['w' + i] || 0) >= 70 ? ' done' : ''), onclick: () => { wi = i; reset(); drawAll(); } }, h('span', { class: 'ar', lang: 'ar' }, w[0]), ' ' + wName(w)))));
       }
     }
     function drawTarget() {

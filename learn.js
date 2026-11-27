@@ -6,15 +6,15 @@
   // [letter, Assamese name, Assamese sound, Latin, how to say it (en), joins to the next letter?, how to say it (as)]
   const LET = [
     ['ا', 'আলিফ', 'আ', 'a', 'A straight line. On its own it carries a vowel; after a letter it stretches the “a” sound.', 0, 'এডাল পোন ৰেখা। অকলে থাকিলে ই স্বৰধ্বনি বহন কৰে; আন আখৰৰ পিছত থাকিলে “আ” ধ্বনিটো দীঘল কৰে।'],
-    ['ب', 'বা', 'ব', 'b', 'Like ব. One dot below.', 1, 'ব-ৰ দৰে। তলত এটা ফুট।'],
-    ['ت', 'তা', 'ত', 't', 'Like ত. Two dots above.', 1, 'ত-ৰ দৰে। ওপৰত দুটা ফুট।'],
+    ['ب', 'বা', 'ব', 'b', '“b” as in “bed”. One dot below.', 1, 'ব-ৰ দৰে। তলত এটা ফুট।'],
+    ['ت', 'তা', 'ত', 't', 'A light “t” as in “tea”, with the tongue tip touching the back of the upper teeth. Two dots above.', 1, 'ত-ৰ দৰে। ওপৰত দুটা ফুট।'],
     ['ث', 'ছা', 'ছ', 'th', 'Soft “th” as in “think”: tip of the tongue between the teeth. Three dots above.', 1, 'কোমল “ছ”: জিভাৰ আগ ওপৰ আৰু তলৰ দাঁতৰ মাজত হালকাকৈ ৰাখি বতাহ এৰক, মাত নালাগে। ওপৰত তিনিটা ফুট।'],
     ['ج', 'জীম', 'জ', 'j', 'Like “j” in “jam”. One dot inside.', 1, 'জ-ৰ দৰে। ভিতৰত এটা ফুট।'],
-    ['ح', 'হা', 'হ', 'ḥ', 'A breathy হ from the middle of the throat, like breathing on a mirror. No dot.', 1, 'ডিঙিৰ মাজভাগৰ পৰা ওলোৱা উশাহযুক্ত হ — আইনাত উশাহ এৰাৰ দৰে। ফুট নাই।'],
-    ['خ', 'খা', 'খ', 'kh', 'A rough খ from the top of the throat. One dot above.', 1, 'ডিঙিৰ ওপৰভাগৰ পৰা ওলোৱা খহটা খ। ওপৰত এটা ফুট।'],
-    ['د', 'দাল', 'দ', 'd', 'Like দ.', 0, 'দ-ৰ দৰে।'],
+    ['ح', 'হা', 'হ', 'ḥ', 'A strong breathy “h” from the middle of the throat, like breathing on a mirror to fog it. No dot.', 1, 'ডিঙিৰ মাজভাগৰ পৰা ওলোৱা উশাহযুক্ত হ — আইনাত উশাহ এৰাৰ দৰে। ফুট নাই।'],
+    ['خ', 'খা', 'খ', 'kh', 'A rough “kh” from the top of the throat, like “ch” in Scottish “loch”. One dot above.', 1, 'ডিঙিৰ ওপৰভাগৰ পৰা ওলোৱা খহটা খ। ওপৰত এটা ফুট।'],
+    ['د', 'দাল', 'দ', 'd', 'A light “d” as in “day”, with the tongue tip touching the back of the upper teeth.', 0, 'দ-ৰ দৰে।'],
     ['ذ', 'যাল', 'য', 'dh', '“th” as in “this”: tongue tip between the teeth, with voice. One dot above.', 0, 'কোমল “য”: জিভাৰ আগ ওপৰ আৰু তলৰ দাঁতৰ মাজত ৰাখি মাতৰ সৈতে উচ্চাৰণ কৰক। ওপৰত এটা ফুট।'],
-    ['ر', 'ৰা', 'ৰ', 'r', 'Like ৰ — a light tap of the tongue.', 0, 'ৰ-ৰ দৰে — জিভাৰ এটা পাতল টোকৰ।'],
+    ['ر', 'ৰা', 'ৰ', 'r', 'A rolled “r”: the tongue tip taps the roof of the mouth once.', 0, 'ৰ-ৰ দৰে — জিভাৰ এটা পাতল টোকৰ।'],
     ['ز', 'যা', 'য', 'z', 'A buzzing “z” as in “zoo”. One dot above.', 0, 'গুণগুণীয়া “য”: দাঁত দুপাৰি ওচৰা-ওচৰি ৰাখি মৌমাখিৰ গুণগুণনিৰ দৰে মাতেৰে উচ্চাৰণ কৰক। ওপৰত এটা ফুট।'],
     ['س', 'ছীন', 'ছ', 's', 'A thin, clear “s”. Three small teeth.', 1, 'পাতল, স্পষ্ট “ছ” — চিঁ-চিঁ শব্দৰ দৰে। তিনিটা সৰু দাঁত।'],
     ['ش', 'শ্বীন', 'শ্ব', 'sh', '“sh” as in “ship”. Three dots above.', 1, '“শ্ব” — কাকো মনে মনে থাকিবলৈ কওঁতে কোৱা “শ্‌-শ্‌”-ৰ দৰে। ওপৰত তিনিটা ফুট।'],
@@ -24,15 +24,15 @@
     ['ظ', 'যা', 'য', 'ẓ', 'A heavy “dh”: tongue tip between the teeth, mouth full.', 1, 'গধুৰ “য”: জিভাৰ আগ দাঁতৰ মাজত ৰাখি মুখ ভৰাই উচ্চাৰণ কৰক।'],
     ['ع', 'আঈন', '‘আ', 'ʿ', 'A squeezed sound from the middle of the throat. Listen to the example and copy it.', 1, 'ডিঙিৰ মাজভাগৰ পৰা চেপি উলিওৱা ধ্বনি। উদাহৰণটো শুনক আৰু অনুকৰণ কৰক।'],
     ['غ', 'গাঈন', 'গ', 'gh', 'Like a soft gargle from the top of the throat. One dot above.', 1, 'ডিঙিৰ ওপৰভাগৰ পৰা কুলকুলি কৰাৰ দৰে কোমল ধ্বনি। ওপৰত এটা ফুট।'],
-    ['ف', 'ফা', 'ফ', 'f', '“f”: upper teeth touch the lower lip (not two lips like Assamese ফ). One dot above.', 1, '“ফ”: ওপৰৰ দাঁতে তলৰ ওঁঠ স্পৰ্শ কৰে (অসমীয়া ফ-ৰ দৰে দুয়োটা ওঁঠেৰে নহয়)। ওপৰত এটা ফুট।'],
+    ['ف', 'ফা', 'ফ', 'f', '“f” as in “fish”: the upper teeth touch the lower lip. One dot above.', 1, '“ফ”: ওপৰৰ দাঁতে তলৰ ওঁঠ স্পৰ্শ কৰে (অসমীয়া ফ-ৰ দৰে দুয়োটা ওঁঠেৰে নহয়)। ওপৰত এটা ফুট।'],
     ['ق', 'ক্বাফ', 'ক্ব', 'q', 'A deep “k” from the very back of the tongue. Two dots above.', 1, 'জিভাৰ একেবাৰে পিছভাগৰ পৰা ওলোৱা গভীৰ “ক”। ওপৰত দুটা ফুট।'],
-    ['ك', 'কাফ', 'ক', 'k', 'Like ক.', 1, 'ক-ৰ দৰে।'],
-    ['ل', 'লাম', 'ল', 'l', 'Like ল.', 1, 'ল-ৰ দৰে।'],
-    ['م', 'মীম', 'ম', 'm', 'Like ম.', 1, 'ম-ৰ দৰে।'],
-    ['ن', 'নূন', 'ন', 'n', 'Like ন. One dot above.', 1, 'ন-ৰ দৰে। ওপৰত এটা ফুট।'],
-    ['ه', 'হা', 'হ', 'h', 'A light হ from the bottom of the throat.', 1, 'ডিঙিৰ তলভাগৰ পৰা ওলোৱা পাতল হ।'],
-    ['و', 'ৱাও', 'ৱ', 'w', 'Like ৱ with rounded lips. After a damma it stretches the “u” sound.', 0, 'ওঁঠ ঘূৰণীয়া কৰি ৱ-ৰ দৰে। পেশৰ পিছত থাকিলে “উ” ধ্বনি দীঘল কৰে।'],
-    ['ي', 'ইয়া', 'য়', 'y', 'Like য়. After a kasra it stretches the “i” sound. Two dots below.', 1, 'য়-ৰ দৰে। যেৰৰ পিছত থাকিলে “ই” ধ্বনি দীঘল কৰে। তলত দুটা ফুট।']
+    ['ك', 'কাফ', 'ক', 'k', '“k” as in “kite”, from the back of the mouth but not as deep as ق.', 1, 'ক-ৰ দৰে।'],
+    ['ل', 'লাম', 'ল', 'l', '“l” as in “light”, kept light and clear.', 1, 'ল-ৰ দৰে।'],
+    ['م', 'মীম', 'ম', 'm', '“m” as in “moon”.', 1, 'ম-ৰ দৰে।'],
+    ['ن', 'নূন', 'ন', 'n', '“n” as in “noon”. One dot above.', 1, 'ন-ৰ দৰে। ওপৰত এটা ফুট।'],
+    ['ه', 'হা', 'হ', 'h', 'A light “h” as in “hat”, from deep in the throat. Do not mix it up with the stronger ح.', 1, 'ডিঙিৰ তলভাগৰ পৰা ওলোৱা পাতল হ।'],
+    ['و', 'ৱাও', 'ৱ', 'w', '“w” as in “water”, with rounded lips. After a damma it stretches the “u” sound.', 0, 'ওঁঠ ঘূৰণীয়া কৰি ৱ-ৰ দৰে। পেশৰ পিছত থাকিলে “উ” ধ্বনি দীঘল কৰে।'],
+    ['ي', 'ইয়া', 'য়', 'y', '“y” as in “yes”. After a kasra it stretches the “i” sound. Two dots below.', 1, 'য়-ৰ দৰে। যেৰৰ পিছত থাকিলে “ই” ধ্বনি দীঘল কৰে। তলত দুটা ফুট।']
   ];
   const FAMILIES = [['ب', 'ت', 'ث', 'ن', 'ي'], ['ج', 'ح', 'خ'], ['د', 'ذ'], ['ر', 'ز'], ['س', 'ش'], ['ص', 'ض'], ['ط', 'ظ'], ['ع', 'غ'], ['ف', 'ق']];
   // [English name, Assamese name, builder, English note, Assamese note]
@@ -96,6 +96,30 @@
   /** The letter's name in the chosen language. */
   const nameOf = (X) => isEn() ? EN_NAMES[LET.indexOf(X)] || X[1] : X[1];
   // English reading of the vowel row, e.g. b → "ba, bi, bu"
+  /* English reading of short vowelled pieces in the lessons (بَ → ba, بَا → bā, أَبَّ → abba, ـهُمْ → hum).
+     Written for the letters, marks and word pieces taught here, not for whole verses. */
+  const LAT = { 'ء': "'", 'أ': "'", 'إ': "'", 'ؤ': "'", 'ئ': "'", 'ة': 'h', 'ى': 'ā', 'ٱ': '' };
+  function toLatin(ar) {
+    const chars = [...String(ar).replace(/ـ/g, '')];
+    let out = '', last = '';
+    const V = { 'َ': 'a', 'ِ': 'i', 'ُ': 'u', 'ً': 'an', 'ٍ': 'in', 'ٌ': 'un' };
+    for (let i = 0; i < chars.length; i++) {
+      const ch = chars[i], prevV = out.slice(-1);
+      if (V[ch]) { out += V[ch]; continue; }
+      if (ch === 'ْ') continue;                                   // sukun: no vowel
+      if (ch === 'ّ') { out += last; continue; }                  // shadda: say the letter twice
+      if (ch === 'ٰ') { out += 'ā'; continue; }                    // small alif
+      if (ch === 'ا') { if (prevV === 'a') out = out.slice(0, -1) + 'ā'; else if (!/an$/.test(out)) out += i === 0 ? 'a' : 'ā'; continue; }
+      if (ch === 'و' && prevV === 'u' && !V[chars[i + 1]]) { out = out.slice(0, -1) + 'ū'; continue; }
+      if ((ch === 'ي' || ch === 'ى') && prevV === 'i' && !V[chars[i + 1]]) { out = out.slice(0, -1) + 'ī'; continue; }
+      if (ch === 'ٱ') { out += 'a'; last = ''; continue; }
+      const row = LET.find(x => x[0] === ch);
+      const c = ch in LAT ? LAT[ch] : row ? row[3] : '';
+      if (c === "'" && i === 0) { last = ''; continue; }          // a word-initial glottal stop is not written
+      out += c; last = c;
+    }
+    return out;
+  }
   const vowelsEn = (lat) => {
     const base = String(lat).split(/[ /,(]/)[0].replace(/[aā]$/, '');
     if (!base || base === '’' || base === "'") return 'a, i, u';
@@ -125,7 +149,8 @@
     const meaning = (w) => AS ? (TR_AS[w.tr] || MEAN_AS[clean(w.m).toLowerCase()] || clean(w.m)) : clean(w.m);
     const wordCard = (w, opts = {}) => h('button', { class: 'wcard', onclick: () => sayWord(w), title: L('Tap to hear', 'শুনিবলৈ টিপক') },
       h('span', { class: 'ar', dir: 'rtl', lang: 'ar' }, w.t),
-      h('span', { class: 'pa', lang: 'as' }, opts.stop ? P.word(w.t) + ' → ' + P.verse([w.t]) : P.word(w.t)),
+      AS ? h('span', { class: 'pa', lang: 'as' }, opts.stop ? P.word(w.t) + ' → ' + P.verse([w.t]) : P.word(w.t))
+        : h('span', { class: 'pa', lang: 'en' }, w.tr || toLatin(w.t)),
       h('span', { class: 'mn' }, opts.note || meaning(w)), h('span', { class: 'spk' }, '🔊 ' + num(w.k)));
     const body = h('div', { class: 'lbody' });
 
@@ -166,14 +191,14 @@
       const out = h('div', { class: 'syll' });
       const draw = () => {
         const t = MARKS[m][2](c);
-        out.replaceChildren(h('div', { class: 'lbig', lang: 'ar' }, t), h('div', { class: 'eq' }, '='), h('div', { class: 'sndbig', lang: 'as' }, P.word(t)),
-          h('p', {}, h('b', {}, L(MARKS[m][0] + ' (' + MARKS[m][1] + '): ', MARKS[m][1] + ': ')), L(MARKS[m][3], MARKS[m][4])));
+        out.replaceChildren(h('div', { class: 'lbig', lang: 'ar' }, t), h('div', { class: 'eq' }, '='), h('div', { class: 'sndbig', lang: AS ? 'as' : 'en' }, AS ? P.word(t) : toLatin(t)),
+          h('p', {}, h('b', {}, L(MARKS[m][0] + ': ', MARKS[m][1] + ': ')), L(MARKS[m][3], MARKS[m][4])));
         out.classList.remove('pop'); void out.offsetWidth; out.classList.add('pop');
         $$('.pickL', body).forEach(b => b.classList.toggle('on', b.dataset.c === c));
         $$('.pickM', body).forEach(b => b.classList.toggle('on', +b.dataset.m === m));
       };
       body.replaceChildren(
-        h('p', { class: 'lead' }, L('A letter alone has no vowel. The small marks tell you which vowel to say. Pick a letter and a mark, and read the sound in Assamese.',
+        h('p', { class: 'lead' }, L('A letter alone has no vowel. The small marks tell you which vowel to say. Pick a letter and a mark, and see how it is said.',
           'অকলশৰীয়া আখৰত কোনো স্বৰধ্বনি নাথাকে। সৰু চিনবোৰে কয় কোনটো স্বৰ উচ্চাৰণ কৰিব লাগে। এটা আখৰ আৰু এটা চিন বাছক, আৰু ধ্বনিটো অসমীয়াত পঢ়ক।')),
         h('div', { class: 'picks', dir: 'rtl' }, BUILD.map(x => h('button', { class: 'chip pickL arc', 'data-c': x, lang: 'ar', onclick: () => { c = x; draw(); } }, x))),
         h('div', { class: 'picks' }, MARKS.map((x, i) => h('button', { class: 'chip pickM', 'data-m': i, onclick: () => { m = i; draw(); } }, L(x[0], x[1])))),
@@ -211,7 +236,7 @@
 
     /* 5. word building */
     const tabBuild = () => {
-      const table = (rows) => h('div', { class: 'affix' }, rows.map(([a, as, en, mAs]) => h('div', {}, h('span', { class: 'ar', lang: 'ar' }, a), h('b', { lang: 'as' }, as), h('span', {}, L(en, mAs)))));
+      const table = (rows) => h('div', { class: 'affix' }, rows.map(([a, as, en, mAs]) => h('div', {}, h('span', { class: 'ar', lang: 'ar' }, a), h('b', { lang: AS ? 'as' : 'en' }, AS ? as : toLatin(a)), h('span', {}, L(en, mAs)))));
       body.replaceChildren(
         h('p', { class: 'lead' }, L('One Arabic word often holds several English words. Small pieces are attached to the front and the end. Once you know these pieces, long words become easy to understand.',
           'আৰবীৰ এটা শব্দত প্ৰায়ে কেইবাটাও অসমীয়া শব্দৰ অৰ্থ থাকে। শব্দৰ আগত আৰু শেষত সৰু সৰু অংশ লগ লাগে। এই অংশবোৰ চিনি পালে দীঘল শব্দও বুজিবলৈ সহজ হয়।')),
@@ -249,11 +274,11 @@
         const opts = shuffle([q, ...shuffle(LET.filter(l => l[1] !== q[1])).slice(0, 3)]);
         const nextBtn = h('button', { class: 'btn gold', hidden: true, onclick: () => { i++; next(); } }, L('Next →', 'পৰৱৰ্তী →'));
         const box = h('div', { class: 'opts' }, opts.map(o => h('button', {
-          class: 'opt', lang: 'as', 'data-c': o[0], onclick: (e) => {
+          class: 'opt', lang: AS ? 'as' : 'en', 'data-c': o[0], onclick: (e) => {
             $$('.opt', box).forEach(b => { b.disabled = true; if (b.dataset.c === q[0]) b.classList.add('right'); });
             if (o[0] === q[0]) { score++; setTimeout(() => { i++; next(); }, 700); } else { e.currentTarget.classList.add('wrong'); nextBtn.hidden = false; }
           }
-        }, o[1] + ' (' + (AS ? o[2] : o[3]) + ')')));
+        }, nameOf(o) + ' (' + (AS ? o[2] : o[3]) + ')')));
         const sheet = openModal(h('h2', {}, L('Which letter is this?', 'এইটো কোন আখৰ?')), h('div', { class: 'muted' }, L(`Letter ${i + 1} of 10`, `আখৰ ${i + 1} / 10`)),
           h('div', { class: 'qprog' }, h('i', { style: `width:${i * 10}%` })), h('div', { class: 'qword', lang: 'ar' }, shape), box, h('div', { class: 'row' }, nextBtn));
       };
@@ -283,5 +308,5 @@
     $$('.ltab', tabs)[Math.min(store.get('learnTab', 0), TABS.length - 1)].click();
   }
 
-  window.Learn = { view, LET, forms, sayLetter, nameOf, EN_NAMES };
+  window.Learn = { view, LET, forms, sayLetter, nameOf, EN_NAMES, toLatin };
 })();

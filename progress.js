@@ -124,7 +124,7 @@
       h('p', { class: 'muted small' }, t('pg_wr_d')),
       h('div', { class: 'pg-letters', dir: 'rtl' }, LET.map((X, i) => {
         const sc = write['l' + i + '.0'], st = status(sc);
-        return h('div', { class: 'pg-cell st-' + st, title: X[1] + (sc != null ? ' · ' + pct(sc) : '') },
+        return h('div', { class: 'pg-cell st-' + st, title: window.Learn.nameOf(X) + (sc != null ? ' · ' + pct(sc) : '') },
           h('span', { class: 'ar', lang: 'ar' }, X[0]), h('small', {}, (sc != null ? pct(sc) : '—') + ' ' + icon[st]));
       })),
       legend([['hi', t('pg_bin_hi')], ['mid', t('pg_bin_mid')], ['lo', t('pg_bin_lo')], ['none', t('pg_bin_none')]]),
@@ -143,7 +143,7 @@
       h('div', { class: 'pg-letters', dir: 'rtl' }, LET.map(X => {
         const st = pstatus(X), p = pron[X[0]];
         const asL = p && !p.last && p.as ? p.as : null;
-        return h('div', { class: 'pg-cell st-' + st, title: X[1] },
+        return h('div', { class: 'pg-cell st-' + st, title: window.Learn.nameOf(X) },
           h('span', { class: 'ar', lang: 'ar' }, X[0]),
           h('small', {}, icon[st] + (asL ? ' ≈ ' : ''), asL ? h('span', { class: 'ar', lang: 'ar' }, asL) : null));
       })),
