@@ -10,6 +10,9 @@
 //   POST ?a=logout                      end this session
 //   POST ?a=delete                      delete the account's synced data and all its sessions
 //   POST ?a=claim   {payment_id}        unlock full access with a Razorpay payment made under another email
+//   GET  ?a=admin                       (admins) free-access emails and payments
+//   POST ?a=admin_add {email, note}     (admins) give an email full access without payment
+//   POST ?a=admin_remove {email}        (admins) take it away again
 //
 // Requests that change anything must send the header "X-Noor: 1"; browsers do not let other sites add it,
 // which together with the SameSite cookie protects against cross-site requests.
@@ -116,6 +119,7 @@ function need_user(array $cfg): array { $u = current_user($cfg); if (!$u) fail(4
 function public_user(array $u, array $cfg = []): array {
     $out = ['email' => $u['email'], 'name' => $u['name'], 'picture' => $u['picture']];
     if ($cfg && !empty($u['sub'])) $out['pro'] = is_pro(db($cfg), (string)$u['sub']);
+    if ($cfg && is_admin($cfg, $u)) $out['admin'] = true;
     return $out;
 }
 function body(array $cfg): array {
@@ -192,6 +196,28 @@ try {
     }
 
     // public: are payments set up? The app only locks tools once the Razorpay webhook secret is on the server.
+    /* ---------- admin ---------- */
+    if (in_array($action, ['admin', 'admin_add', 'admin_remove'], true)) {
+        $u = need_user($cfg);
+        if (!is_admin($cfg, $u)) fail(403, 'admin');
+        $pdo = db($cfg);
+        if ($action === 'admin_add' && $method === 'POST') {
+            $b = body($cfg);
+            $email = norm_email((string)($b['email'] ?? ''));
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 200) fail(400, 'email');
+            $note = mb_substr(trim((string)($b['note'] ?? '')), 0, 120);
+            $pdo->prepare('INSERT INTO grants (email, note, added_by, created) VALUES (?, ?, ?, ?)
+                           ON CONFLICT(email) DO UPDATE SET note = excluded.note')->execute([$email, $note, norm_email((string)$u['email']), time()]);
+        } elseif ($action === 'admin_remove' && $method === 'POST') {
+            $b = body($cfg);
+            $pdo->prepare('DELETE FROM grants WHERE email = ?')->execute([norm_email((string)($b['email'] ?? ''))]);
+        } elseif ($method !== 'GET') fail(405, 'method');
+        $grants = $pdo->query('SELECT g.email, g.note, g.added_by, g.created, (SELECT max(seen) FROM users u WHERE lower(u.email) = g.email) AS seen FROM grants g ORDER BY g.created DESC')->fetchAll(PDO::FETCH_ASSOC);
+        $pays = $pdo->query('SELECT p.id, p.email, p.amount, p.currency, p.status, p.created, (SELECT email FROM users u WHERE u.sub = p.sub) AS account FROM payments p ORDER BY p.created DESC LIMIT 200')->fetchAll(PDO::FETCH_ASSOC);
+        $counts = ['users' => (int)$pdo->query('SELECT count(*) FROM users')->fetchColumn()];
+        out(200, ['grants' => $grants, 'payments' => $pays, 'counts' => $counts]);
+    }
+
     if ($action === 'paywall' && $method === 'GET') {
         $f = $cfg['rzp_webhook_secret_file'];
         out(200, ['ready' => is_readable($f) && trim((string)file_get_contents($f)) !== '']);

@@ -642,6 +642,7 @@
     if (location.hash.startsWith('#/progress')) { document.title = t('nav_progress') + (S.lang === 'as' ? ' · নূৰ' : ' · Noor'); $('#player').hidden = true; window.Progress.view($('#app')); window.scrollTo(0, 0); return; }
     const hz = location.hash.match(/^#\/hifz(?:\/(\d+)(?:\/(\d+))?)?/);
     if (hz) { document.title = t('hz_title') + (S.lang === 'as' ? ' · নূৰ' : ' · Noor'); $('#player').hidden = true; window.scrollTo(0, 0); return window.Hifz.view($('#app'), hz[1] ? Math.min(114, Math.max(1, +hz[1])) : 0, hz[2] ? +hz[2] : 0); }
+    if (location.hash.startsWith('#/admin')) { document.title = t('ad_title') + ' · Noor'; $('#player').hidden = true; window.Admin.view($('#app')); window.scrollTo(0, 0); return; }
     if (location.hash.startsWith('#/review')) { document.title = t('rv_title') + (S.lang === 'as' ? ' · নূৰ' : ' · Noor'); $('#player').hidden = true; window.Review.view($('#app')); window.scrollTo(0, 0); return; }
     if (location.hash.startsWith('#/saved')) { document.title = t('bm_title') + (S.lang === 'as' ? ' · নূৰ' : ' · Noor'); $('#player').hidden = true; window.Bookmarks.view($('#app')); window.scrollTo(0, 0); return; }
     if (location.hash.startsWith('#/learn')) { document.title = t('nav_learn') + (S.lang === 'as' ? ' · নূৰ' : ' · Noor'); $('#player').hidden = true; window.Learn.view($('#app')); window.scrollTo(0, 0); return; }

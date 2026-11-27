@@ -21,6 +21,8 @@ function db(array $cfg): PDO {
     $pdo->exec('CREATE TABLE IF NOT EXISTS payments (id TEXT PRIMARY KEY, email TEXT, contact TEXT, amount INTEGER, currency TEXT, status TEXT, created INTEGER, sub TEXT)');
     // where the payment came from (description, notes, order) — kept to tell Noor's pages from other products
     try { $pdo->exec('ALTER TABLE payments ADD COLUMN meta TEXT'); } catch (Throwable $e) { /* already there */ }
+    // emails given full access by an admin, without paying
+    $pdo->exec('CREATE TABLE IF NOT EXISTS grants (email TEXT PRIMARY KEY, note TEXT, added_by TEXT, created INTEGER)');
     return $pdo;
 }
 
@@ -54,5 +56,12 @@ function link_payments_by_email(PDO $pdo, string $sub, string $email): void {
 
 function is_pro(PDO $pdo, string $sub): bool {
     $q = $pdo->prepare("SELECT 1 FROM payments WHERE sub = ? AND status = 'captured' LIMIT 1"); $q->execute([$sub]);
+    if ($q->fetchColumn()) return true;
+    $q = $pdo->prepare('SELECT 1 FROM grants g JOIN users u ON lower(u.email) = g.email WHERE u.sub = ? LIMIT 1'); $q->execute([$sub]);
     return (bool)$q->fetchColumn();
+}
+
+function is_admin(array $cfg, ?array $u): bool {
+    if (!$u || empty($u['email'])) return false;
+    return in_array(norm_email((string)$u['email']), array_map('norm_email', $cfg['admin_emails'] ?? []), true);
 }

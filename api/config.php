@@ -13,5 +13,7 @@ return array_merge([
     // Full access: Razorpay webhook secret (one line, saved on the server, never in git) and the accepted prices
     'rzp_webhook_secret_file' => getenv('NOOR_RZP_SECRET_FILE') ?: '/var/lib/noor-sync/razorpay-webhook-secret',
     'prices' => [['INR', 4900], ['USD', 299]],
+    // Google accounts that may open the admin page (give free full access, see payments)
+    'admin_emails' => ['mahfuzz786@gmail.com'],
     'max_bytes' => 2 * 1024 * 1024,
 ], is_file(__DIR__ . '/config.local.php') ? (require __DIR__ . '/config.local.php') : []);

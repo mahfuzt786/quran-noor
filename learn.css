@@ -443,3 +443,11 @@ body:has(#player:not([hidden])) .upd { bottom: calc(108px + env(safe-area-inset-
 .pr-claim summary { cursor: pointer; font-size: 14px; color: var(--muted); }
 .pr-claim .row { margin-top: 8px; flex-wrap: nowrap; }
 .pr-claim-in { flex: 1; min-width: 0; }
+
+/* ============ admin ============ */
+.ad-stats { grid-template-columns: repeat(3, 1fr); margin: 0 0 20px; }
+.ad-add { display: grid; grid-template-columns: 2fr 1.4fr auto; gap: 8px; align-items: center; margin: 10px 0 4px; }
+.ad-body .pg-tablewrap { margin: 8px 0 26px; }
+.ad-body code { font-size: 12px; }
+.ad-link { margin: 18px 0 0; }
+@media (max-width: 760px) { .ad-add { grid-template-columns: 1fr; } .ad-stats { grid-template-columns: repeat(3, 1fr); } }

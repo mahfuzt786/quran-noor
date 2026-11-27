@@ -170,6 +170,7 @@
           h('div', { class: 'pg-foot' }, h('p', { class: 'muted small' }, t('pg_device_note')), h('button', { class: 'btn sm', onclick: reset }, t('pg_reset')))]
           : h('div', { class: 'endcard pg-empty' }, h('h3', {}, t('pg_empty_t')), h('p', {}, t('pg_empty')),
             h('div', { class: 'row' }, h('a', { class: 'btn gold', href: '#/s/1' }, t('pg_go_surah')), h('a', { class: 'btn', href: '#/learn' }, t('nav_learn')))),
+        store.get('syncUser', null)?.admin ? h('p', { class: 'ad-link' }, h('a', { class: 'btn sm', href: '#/admin' }, '⚙ ' + t('ad_title'))) : null,
         window.Pro && window.Pro.ready() ? window.Pro.section() : null,
         window.Sync ? window.Sync.section() : null,
         window.Offline ? window.Offline.section() : null,
