@@ -433,3 +433,13 @@ body:has(#player:not([hidden])) .upd { bottom: calc(108px + env(safe-area-inset-
 .hz-all { font-weight: 800; color: var(--ok); }
 .hz-howto { margin-top: 16px; }
 @media (max-width: 760px) { .hz-stage { padding: 14px; } .hz-head { justify-content: flex-start; } }
+
+/* ============ full access ============ */
+.pr-box { display: grid; gap: 10px; }
+.pr-box p { margin: 0; }
+.pr-cur { justify-self: start; }
+.pr-pay { display: grid; gap: 6px; justify-items: start; }
+.pr-have { font-weight: 800; color: var(--ok); }
+.pr-claim summary { cursor: pointer; font-size: 14px; color: var(--muted); }
+.pr-claim .row { margin-top: 8px; flex-wrap: nowrap; }
+.pr-claim-in { flex: 1; min-width: 0; }

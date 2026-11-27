@@ -161,7 +161,7 @@
   N().store.set = function (k, v) { origSet.call(this, k, v); if (RULES[k]) schedule(); };
 
   function signedOut(expired) {
-    user = null; N().store.set('syncUser', null); N().store.set('syncBase', null);
+    user = null; N().store.set('syncUser', null); N().store.set('syncBase', null); N().store.set('syncPro', false);
     notify();
     if (expired) N().toast(N().t('sy_expired'));
   }
@@ -178,7 +178,7 @@
   async function onCredential(resp) {
     const r = await api('login', 'POST', { credential: resp.credential }).catch(() => ({ status: 0, j: {} }));
     if (r.status !== 200) { N().toast(N().t(r.j.error === 'storage' ? 'sy_err_storage' : 'sy_err_login')); return; }
-    user = r.j.user; N().store.set('syncUser', user); N().store.set('syncBase', null);
+    user = r.j.user; N().store.set('syncUser', user); N().store.set('syncBase', null); window.Pro?.setUser(user);
     notify(); N().toast(N().t('sy_signed_in', user.name || user.email));
     sync(false);
   }
@@ -267,7 +267,7 @@
     if (r !== 'ok') { N().toast(N().t('sy_err_login')); return true; }
     const me = await api('me').catch(() => null);
     if (!me || me.status !== 200) { N().toast(N().t('sy_err_login')); return true; }
-    user = me.j.user; N().store.set('syncUser', user); N().store.set('syncBase', null);
+    user = me.j.user; N().store.set('syncUser', user); N().store.set('syncBase', null); window.Pro?.setUser(user);
     notify(); N().toast(N().t('sy_signed_in', user.name || user.email));
     sync(false);
     return true;
@@ -279,7 +279,7 @@
     const me = await api('me').catch(() => null);
     if (!me) return;                                   // offline: try again when back online
     if (me.status === 401) return signedOut(true);
-    if (me.status === 200) { user = me.j.user; N().store.set('syncUser', user); }
+    if (me.status === 200) { user = me.j.user; N().store.set('syncUser', user); window.Pro?.setUser(user); }
     sync(true);
   }
   window.addEventListener('online', () => schedule(2000));
@@ -289,5 +289,5 @@
   });
   if (document.readyState === 'complete') start(); else window.addEventListener('load', start);
 
-  window.Sync = { section, sync, merge, signedIn: () => !!user, user: () => user, _test: { merge, mergeKey } };
+  window.Sync = { section, sync, merge, renderButton, signedIn: () => !!user, user: () => user, _test: { merge, mergeKey } };
 })();

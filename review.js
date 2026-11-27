@@ -239,7 +239,8 @@
         nextItem();
       };
       let card;
-      try { card = kindOf(id) === 'v' ? await verseCard(id, finish) : letterCard(id, finish); }
+      const locked = kindOf(id) === 'v' && window.Pro && !window.Pro.allowed(+id.split(':')[1]);
+      try { card = locked ? window.Pro.lockedCard(() => { done++; nextItem(); }) : kindOf(id) === 'v' ? await verseCard(id, finish) : letterCard(id, finish); }
       catch {
         if (kindOf(id) === 'v' && navigator.onLine === false) card = h('article', { class: 'rv-card' }, h('p', {}, t('rv_offline_item')), h('div', { class: 'row left' }, h('button', { class: 'btn sm', onclick: () => { queue.push(id); nextItem(); } }, t('rv_skip'))));
         else { drop(id); done++; return nextItem(); }   // the item no longer exists

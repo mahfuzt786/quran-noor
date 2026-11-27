@@ -77,7 +77,7 @@
       const c = CH[id - 1], m = memorisedCount(id, c.n);
       return h('a', { class: 'hz-pick' + (m === c.n ? ' done' : m ? ' part' : ''), href: '#/hifz/' + id },
         h('span', { class: 'badge' }, num(id)),
-        h('span', { class: 'mid' }, h('b', {}, sname(c)), h('span', { class: 'meta' }, t('hz_count', [m, c.n]))),
+        h('span', { class: 'mid' }, h('b', {}, sname(c)), h('span', { class: 'meta' }, (window.Pro && !window.Pro.allowed(id) ? '🔒 ' : '') + t('hz_count', [m, c.n]))),
         h('span', { class: 'arn', lang: 'ar' }, c.ar),
         h('i', { class: 'hz-bar' }, h('i', { style: `width:${m / c.n * 100}%` })));
     };
@@ -99,6 +99,12 @@
     const { h, t, num, chapters, sname, footer, store, lang, sayWord, burst, toast } = N();
     if (!id) return picker(app);
     const meta = chapters()[id - 1]; if (!meta) { location.hash = '#/hifz'; return; }
+    if (window.Pro && !window.Pro.allowed(id)) {
+      app.replaceChildren(h('div', { class: 'wrap' }, h('section', { class: 'sec hz-sec' },
+        h('h1', {}, '🧠 ' + sname(meta)), h('p', {}, '🔒 ' + t('pr_locked_d')), h('div', { class: 'sy-card' }, window.Pro.offerBox()),
+        h('p', {}, h('a', { class: 'btn', href: '#/hifz' }, t('hz_other')))), footer()));
+      return;
+    }
     app.replaceChildren(h('div', { class: 'wrap' }, h('div', { class: 'skeleton' })));
     let raw, verses;
     try { ({ raw, verses } = await N().surah(id)); } catch { app.replaceChildren(h('div', { class: 'wrap' }, h('div', { class: 'err' }, t('load_err')))); return; }

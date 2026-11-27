@@ -139,6 +139,7 @@
   /** Start an attempt on verse index i of the current surah. */
   function start(i) {
     const cur = N().cur(); if (!cur || !cur.verses[i]) return;
+    if (window.Pro && !window.Pro.gate(cur.meta.id)) return;      // full access for surahs outside the free set
     ensureReady(() => begin(i));
   }
 

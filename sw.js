@@ -3,7 +3,7 @@
    - Quran text (data/) and fonts are kept once fetched.
    - Word sounds are kept once played. Full-surah recitations are kept only when the user downloads them.
    Bump VERSION together with the ?v= numbers in index.html on every deploy. */
-const VERSION = 'v54';
+const VERSION = 'v56';
 const SHELL = 'noor-shell-' + VERSION;
 const DATA = 'noor-data-1';      // same name app.js uses for the surah files
 const FONTS = 'noor-fonts-1';

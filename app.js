@@ -436,7 +436,7 @@
   const isDone = (id) => { const p = S.prog[id]; return !!(p && (p.quiz >= 70 || p.listened)); };
   const footer = () => h('footer', { class: 'foot' },
     h('div', { class: 'foot-orn', 'aria-hidden': 'true' }, '۞'),
-    h('p', {}, t('foot')), h('p', { class: 'muted small' }, t('foot_credit')), h('p', { class: 'muted small' }, h('a', { href: 'privacy.html' }, t('sy_privacy_link'))));
+    h('p', {}, t('foot')), h('p', { class: 'muted small' }, t('foot_credit')), h('p', { class: 'muted small' }, h('a', { href: 'privacy.html' }, t('sy_privacy_link')), ' · ', h('a', { href: 'terms.html' }, t('pr_terms'))));
 
   function viewHome() {
     document.title = t('title');

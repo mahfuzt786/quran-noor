@@ -9,12 +9,13 @@
 //   POST api/gsi.php                    Google sends the redirect sign-in here, then the page is reopened
 //   POST ?a=logout                      end this session
 //   POST ?a=delete                      delete the account's synced data and all its sessions
+//   POST ?a=claim   {payment_id}        unlock full access with a Razorpay payment made under another email
 //
 // Requests that change anything must send the header "X-Noor: 1"; browsers do not let other sites add it,
 // which together with the SameSite cookie protects against cross-site requests.
 
 declare(strict_types=1);
-$cfg = require __DIR__ . '/config.php';
+require __DIR__ . '/lib.php';
 
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
@@ -39,20 +40,6 @@ if (defined('NOOR_GSI')) { gsi_return($cfg); }
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 if ($origin !== '' && !in_array($origin, $cfg['origins'], true)) fail(403, 'origin');
 if ($method !== 'GET' && ($_SERVER['HTTP_X_NOOR'] ?? '') !== '1') fail(403, 'header');
-
-/* ---------- storage ---------- */
-function db(array $cfg): PDO {
-    static $pdo = null;
-    if ($pdo) return $pdo;
-    $dir = dirname($cfg['db_path']);
-    if (!is_dir($dir) || !is_writable($dir)) fail(503, 'storage');      // the server folder is not set up yet
-    $pdo = new PDO('sqlite:' . $cfg['db_path'], null, null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
-    $pdo->exec('PRAGMA journal_mode = WAL; PRAGMA busy_timeout = 4000; PRAGMA foreign_keys = ON;');
-    $pdo->exec('CREATE TABLE IF NOT EXISTS users (sub TEXT PRIMARY KEY, email TEXT, name TEXT, picture TEXT, created INTEGER, seen INTEGER)');
-    $pdo->exec('CREATE TABLE IF NOT EXISTS sessions (hash TEXT PRIMARY KEY, sub TEXT NOT NULL REFERENCES users(sub) ON DELETE CASCADE, created INTEGER, expires INTEGER)');
-    $pdo->exec('CREATE TABLE IF NOT EXISTS docs (sub TEXT PRIMARY KEY REFERENCES users(sub) ON DELETE CASCADE, body TEXT NOT NULL, rev INTEGER NOT NULL, updated INTEGER)');
-    return $pdo;
-}
 
 /* ---------- Google sign-in ---------- */
 function verify_google(string $idToken, array $cfg): array {
@@ -86,6 +73,7 @@ function start_session(array $g, array $cfg): void {
     $pdo->prepare('INSERT INTO sessions (hash, sub, created, expires) VALUES (?, ?, ?, ?)')->execute([hash('sha256', $sid), $g['sub'], $now, $exp]);
     $pdo->prepare('DELETE FROM sessions WHERE expires < ?')->execute([$now]);
     set_cookie($sid, $exp);
+    link_payments_by_email($pdo, $g['sub'], $g['email']);
 }
 
 /* ---------- redirect sign-in ----------
@@ -125,7 +113,11 @@ function current_user(array $cfg): ?array {
     return $u ?: null;
 }
 function need_user(array $cfg): array { $u = current_user($cfg); if (!$u) fail(401, 'signin'); return $u; }
-function public_user(array $u): array { return ['email' => $u['email'], 'name' => $u['name'], 'picture' => $u['picture']]; }
+function public_user(array $u, array $cfg = []): array {
+    $out = ['email' => $u['email'], 'name' => $u['name'], 'picture' => $u['picture']];
+    if ($cfg && !empty($u['sub'])) $out['pro'] = is_pro(db($cfg), (string)$u['sub']);
+    return $out;
+}
 function body(array $cfg): array {
     $raw = file_get_contents('php://input', false, null, 0, $cfg['max_bytes'] + 1);
     if ($raw === false || strlen($raw) > $cfg['max_bytes']) fail(413, 'too_large');
@@ -140,7 +132,7 @@ try {
         $b = body($cfg);
         $g = verify_google((string)($b['credential'] ?? ''), $cfg);
         start_session($g, $cfg);
-        out(200, ['user' => public_user($g)]);
+        out(200, ['user' => public_user($g, $cfg)]);
     }
 
     if ($action === 'nonce' && $method === 'GET') {
@@ -153,7 +145,8 @@ try {
         $u = current_user($cfg);
         if (!$u) fail(401, 'signin');
         db($cfg)->prepare('UPDATE users SET seen = ? WHERE sub = ?')->execute([time(), $u['sub']]);
-        out(200, ['user' => public_user($u)]);
+        link_payments_by_email(db($cfg), $u['sub'], (string)$u['email']);
+        out(200, ['user' => public_user($u, $cfg)]);
     }
 
     if ($action === 'data' && $method === 'GET') {
@@ -196,6 +189,26 @@ try {
         db($cfg)->prepare('DELETE FROM users WHERE sub = ?')->execute([$u['sub']]);   // sessions and data go with it
         set_cookie('', 1);
         out(200, ['ok' => true]);
+    }
+
+    // public: are payments set up? The app only locks tools once the Razorpay webhook secret is on the server.
+    if ($action === 'paywall' && $method === 'GET') {
+        $f = $cfg['rzp_webhook_secret_file'];
+        out(200, ['ready' => is_readable($f) && trim((string)file_get_contents($f)) !== '']);
+    }
+
+    if ($action === 'claim' && $method === 'POST') {
+        $u = need_user($cfg); $b = body($cfg);
+        $pid = trim((string)($b['payment_id'] ?? ''));
+        if (!preg_match('/^pay_[A-Za-z0-9]{8,30}$/', $pid)) fail(400, 'payment_id');
+        $pdo = db($cfg);
+        $q = $pdo->prepare('SELECT sub, status FROM payments WHERE id = ?'); $q->execute([$pid]);
+        $row = $q->fetch(PDO::FETCH_ASSOC);
+        if (!$row) fail(404, 'unknown');                       // not (yet) reported by Razorpay
+        if ($row['status'] !== 'captured') fail(409, 'refunded');
+        if ($row['sub'] && $row['sub'] !== $u['sub']) fail(409, 'taken');
+        $pdo->prepare('UPDATE payments SET sub = ? WHERE id = ? AND (sub IS NULL OR sub = ?)')->execute([$u['sub'], $pid, $u['sub']]);
+        out(200, ['user' => public_user($u, $cfg)]);
     }
 
     fail(404, 'action');
