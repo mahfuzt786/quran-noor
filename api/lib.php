@@ -19,6 +19,8 @@ function db(array $cfg): PDO {
     // Razorpay payments for full access. sub is the Google account it unlocks (NULL until matched or claimed).
     // Kept even if the account is deleted, so a refund or a later claim can still be checked.
     $pdo->exec('CREATE TABLE IF NOT EXISTS payments (id TEXT PRIMARY KEY, email TEXT, contact TEXT, amount INTEGER, currency TEXT, status TEXT, created INTEGER, sub TEXT)');
+    // where the payment came from (description, notes, order) — kept to tell Noor's pages from other products
+    try { $pdo->exec('ALTER TABLE payments ADD COLUMN meta TEXT'); } catch (Throwable $e) { /* already there */ }
     return $pdo;
 }
 
@@ -31,6 +33,8 @@ function record_payment(PDO $pdo, array $p, string $status): void {
     $pdo->prepare('INSERT INTO payments (id, email, contact, amount, currency, status, created, sub) VALUES (?, ?, ?, ?, ?, ?, ?, NULL)
                    ON CONFLICT(id) DO UPDATE SET status = excluded.status')
         ->execute([$id, $email, (string)($p['contact'] ?? ''), (int)($p['amount'] ?? 0), (string)($p['currency'] ?? ''), $status, (int)($p['created_at'] ?? time())]);
+    $meta = ['description' => $p['description'] ?? null, 'notes' => $p['notes'] ?? null, 'order_id' => $p['order_id'] ?? null, 'invoice_id' => $p['invoice_id'] ?? null];
+    $pdo->prepare('UPDATE payments SET meta = ? WHERE id = ?')->execute([json_encode($meta, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), $id]);
     if ($email !== '') {
         $q = $pdo->prepare('SELECT sub FROM users WHERE lower(email) = ? LIMIT 1'); $q->execute([$email]);
         $sub = $q->fetchColumn();
