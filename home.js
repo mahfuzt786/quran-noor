@@ -33,7 +33,8 @@
         h('div', { class: 'cta' },
           h('a', { class: 'btn gold lg', href: '#/s/' + (last ? last.id : 1) }, last ? t('cta_continue', N().sname(last)) : t('cta_start')),
           h('a', { class: 'btn glass', href: '#/learn' }, t('cta_learn')),
-          h('a', { class: 'btn glass', href: '#/surahs' }, t('cta_all'))))),
+          h('a', { class: 'btn glass', href: '#/surahs' }, t('cta_all')),
+          h('a', { class: 'btn glass', href: 'surah/' }, '📖 ' + t('hm_pages'))))),
       h('div', { class: 'wrap' },
         window.Goals ? window.Goals.homeCard() : null,
         window.Review ? window.Review.homeCard() : null,
@@ -46,6 +47,10 @@
         plans,
         window.Sync ? window.Sync.section() : null,
         window.Offline ? window.Offline.section() : null,
+
+        h('section', { class: 'sec', id: 'faq' },
+          h('div', { class: 'sec-title' }, h('h2', {}, t('hm_faq_t')), h('span', {}, t('hm_faq_sub'))),
+          h('div', { class: 'hm-faq' }, [1, 2, 3, 4, 5, 6, 7].map(i => h('details', {}, h('summary', {}, t('hm_q' + i)), h('p', {}, t('hm_a' + i)))))),
 
         h('section', { class: 'sec', id: 'policies' },
           h('div', { class: 'sec-title' }, h('h2', {}, t('hm_pol_t')), h('span', {}, t('hm_pol_sub'))),

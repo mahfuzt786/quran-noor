@@ -524,6 +524,15 @@
       h('p', { class: 'en', lang: 'en' }, h('span', { class: 'lbl' }, t('lbl_en')), v.en));
   }
 
+  let slugs = null;
+  async function shareSurah(meta) {
+    try { slugs = slugs || await (await fetch(`${DATA}slugs.json`)).json(); } catch { slugs = null; }
+    const url = 'https://smahfuzm.in/quran-noor/' + (slugs ? `surah/${slugs[meta.id - 1]}/` : `#/s/${meta.id}`);
+    const text = t('share_text', meta.name);
+    if (navigator.share) { try { await navigator.share({ title: `Surah ${meta.name} · Noor`, text, url }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+    try { await navigator.clipboard.writeText(text + ' ' + url); toast(t('share_copied')); } catch { window.prompt(t('share'), url); }
+  }
+
   async function viewSurah(id, focusVerse) {
     const meta = S.chapters[id - 1]; if (!meta) { location.hash = '#/surahs'; return; }
     document.title = `${sname(meta)} (${meta.ar}) · ${S.lang === 'as' ? 'নূৰ' : 'Noor'}`;
@@ -565,6 +574,7 @@
             h('button', { class: 'btn gold', onclick: () => play(resume) }, h('span', { html: '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>' }), resume ? t('continue_v', resume + 1) : t('listen')),
             resume ? h('button', { class: 'btn glass', onclick: () => { const el = verseEl(resume); el ? el.scrollIntoView({ block: 'center', behavior: 'smooth' }) : toast(t('v_loading')); } }, '↓ ' + num(resume + 1)) : null,
             h('a', { class: 'btn glass', href: '#/hifz/' + id }, '🧠 ' + t('hz_btn')),
+            h('button', { class: 'btn glass', onclick: () => shareSurah(meta) }, '↗ ' + t('share')),
             window.Offline && 'caches' in window ? window.Offline.surahButton(id, sname(meta)) : null)),
         h('div', { class: 'arname', lang: 'ar' }, meta.ar))),
       h('div', { class: 'wrap' },

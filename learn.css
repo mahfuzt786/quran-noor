@@ -584,3 +584,16 @@ body:has(#player:not([hidden])) .upd { bottom: calc(108px + env(safe-area-inset-
 .btn[disabled] { opacity: .45; cursor: not-allowed; }
 .pc-agree a { color: var(--gold); text-decoration: underline; text-underline-offset: 2px; }
 #app .sec[id] { scroll-margin-top: 76px; }
+
+/* homepage questions */
+.hm-faq { display: grid; gap: 8px; }
+.hm-faq details { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 0 16px; }
+.hm-faq summary { cursor: pointer; padding: 14px 0; font-weight: 700; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+.hm-faq summary::-webkit-details-marker { display: none; }
+.hm-faq summary::after { content: "+"; color: var(--gold); font-size: 20px; line-height: 1; }
+.hm-faq details[open] summary::after { content: "−"; }
+.hm-faq p { margin: 0 0 14px; color: var(--muted); line-height: 1.6; }
+/* the plain text in index.html that search engines read; the app replaces it as soon as it starts */
+.seo-static { padding-top: 30px; padding-bottom: 30px; }
+.seo-static h1 { font-size: 28px; } .seo-static h2 { font-size: 20px; margin-top: 22px; } .seo-static h3 { font-size: 16px; margin: 14px 0 2px; }
+.seo-static ul { columns: 2; padding-left: 18px; }

@@ -1,7 +1,7 @@
 {
   "name": "Noor — Quran recitation practice",
   "short_name": "Noor",
-  "description": "Recite the Quran fluently and understand every word, with Assamese pronunciation and meaning.",
+  "description": "Learn to recite the Quran and understand every word: all 114 surahs word by word with Assamese pronunciation and translation, recitation check, memorisation and smart review.",
   "lang": "as",
   "dir": "ltr",
   "start_url": "./",

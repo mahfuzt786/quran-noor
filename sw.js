@@ -3,7 +3,7 @@
    - Quran text (data/) and fonts are kept once fetched.
    - Word sounds are kept once played. Full-surah recitations are kept only when the user downloads them.
    Bump VERSION together with the ?v= numbers in index.html on every deploy. */
-const VERSION = 'v72';
+const VERSION = 'v73';
 const SHELL = 'noor-shell-' + VERSION;
 const DATA = 'noor-data-1';      // same name app.js uses for the surah files
 const FONTS = 'noor-fonts-1';
@@ -100,7 +100,12 @@ self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-  if (req.mode === 'navigate' && url.origin === location.origin) return e.respondWith(page(req));
+  // only the app's own page is the offline shell; surah pages, policies etc. load from the network as they are
+  if (req.mode === 'navigate' && url.origin === location.origin) {
+    const scope = new URL(self.registration.scope).pathname;
+    if (url.pathname === scope || url.pathname === scope + 'index.html') return e.respondWith(page(req));
+    return;
+  }
   if (url.origin === location.origin) {
     if (url.pathname.includes('/data/')) return e.respondWith(cacheFirst(DATA, req));
     if (url.pathname.includes('/audio/letters/')) return e.respondWith(cacheFirst(LETTERS, req, { key: url.origin + url.pathname, range: true }));
