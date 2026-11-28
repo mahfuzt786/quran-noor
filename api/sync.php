@@ -153,6 +153,12 @@ try {
         out(200, ['user' => public_user($u, $cfg)]);
     }
 
+    // syncing progress is part of full access once payments are switched on
+    if ($action === 'data') {
+        $u = need_user($cfg);
+        if (paywall_ready($cfg) && !is_pro(db($cfg), (string)$u['sub'])) fail(402, 'pro');
+    }
+
     if ($action === 'data' && $method === 'GET') {
         $u = need_user($cfg);
         $q = db($cfg)->prepare('SELECT body, rev, updated FROM docs WHERE sub = ?'); $q->execute([$u['sub']]);
@@ -224,8 +230,7 @@ try {
     }
 
     if ($action === 'paywall' && $method === 'GET') {
-        $f = $cfg['rzp_webhook_secret_file'];
-        out(200, ['ready' => is_readable($f) && trim((string)file_get_contents($f)) !== '']);
+        out(200, ['ready' => paywall_ready($cfg)]);
     }
 
     if ($action === 'claim' && $method === 'POST') {

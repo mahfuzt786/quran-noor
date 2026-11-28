@@ -179,7 +179,9 @@
 
     async function open() {
       const { openModal, closeModal, toast } = N();
-      if (await isKept(id)) {
+      const kept = await isKept(id);
+      if (!kept && window.Pro && !window.Pro.need('offline')) return;
+      if (kept) {
         const r = reg()[id];
         return openModal(h('h2', {}, t('off_have')), h('p', {}, name + ' · ' + mb(r.b) + (r.w ? ' · ' + t('off_words_n', r.w) : '')),
           h('div', { class: 'row' },
@@ -236,6 +238,7 @@
       textBtn.hidden = n >= 114;
     };
     textBtn.onclick = async () => {
+      if (window.Pro && !window.Pro.need('offline')) return;
       textBtn.disabled = true; textBar.hidden = false;
       const ids = Array.from({ length: 114 }, (_, i) => i + 1); let done = 0, failed = 0;
       const worker = async () => { while (ids.length) { const id = ids.shift(); try { await surahJSON(id); } catch { failed++; } done++; textBar.firstChild.style.width = (done / 114 * 100) + '%'; } };

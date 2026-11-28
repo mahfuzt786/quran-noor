@@ -104,17 +104,21 @@
   let user = N().store.get('syncUser', null);       // { email, name, picture } while signed in on this device
   let busy = false, again = false, timer = null, lastErr = '';
   const listeners = new Set();
-  const notify = () => listeners.forEach(f => { try { f(); } catch { /* card gone */ } });
+  const notify = () => { listeners.forEach(f => { try { f(); } catch { /* card gone */ } }); window.Pro?.bar && window.Pro.bar(); };
+  // syncing is part of full access once payments are switched on (the server checks too: 402)
+  const locked = () => !!(window.Pro && !window.Pro.unlocked());
   const lastSync = () => N().store.get('syncAt', 0);
 
   async function sync(quiet) {
     if (!user) return;
+    if (locked()) { lastErr = 'pro'; notify(); return; }
     if (busy) { again = true; return; }
     busy = true; lastErr = ''; notify();
     try {
       for (let attempt = 0; attempt < 3; attempt++) {
         const got = await api('data');
         if (got.status === 401) return signedOut(true);
+        if (got.status === 402) { lastErr = 'pro'; return; }
         if (got.status !== 200) throw new Error(got.j.error || 'http ' + got.status);
         const baseDoc = N().store.get('syncBase', null);
         const base = baseDoc && baseDoc.email === user.email ? baseDoc.keys : {};
@@ -126,6 +130,7 @@
           const put = await api('data', 'PUT', { data: { v: 1, keys: merged }, rev });
           if (put.status === 409) continue;            // another device saved in between: merge again
           if (put.status === 401) return signedOut(true);
+          if (put.status === 402) { lastErr = 'pro'; return; }
           if (put.status !== 200) throw new Error(put.j.error || 'http ' + put.status);
           rev = put.j.rev;
         }
@@ -241,6 +246,18 @@
         renderButton(btn);
         return;
       }
+      if (lastErr === 'pro' || locked()) {
+        box.replaceChildren(
+          h('div', { class: 'sy-who' },
+            user.picture ? h('img', { src: user.picture, alt: '', width: '44', height: '44', referrerpolicy: 'no-referrer' }) : h('span', { class: 'sy-av' }, (user.name || user.email || '?')[0]),
+            h('div', {}, h('b', {}, user.name || user.email), h('span', { class: 'muted small' }, user.email))),
+          h('p', { class: 'sy-status' }, '🔒 ' + t('sy_locked')),
+          h('p', { class: 'muted small' }, t('sy_locked_d')),
+          h('div', { class: 'row left' },
+            h('button', { class: 'btn sm gold', onclick: () => window.Pro.offer('sync') }, '🔓 ' + t('pr_title')),
+            h('button', { class: 'btn sm', onclick: signOut }, t('sy_out'))));
+        return;
+      }
       const status = busy ? t('sy_busy') : lastErr ? t(lastErr === 'offline' ? 'sy_err_offline' : lastErr === 'storage' ? 'sy_err_storage' : 'sy_err') : t('sy_last', ago(lastSync()));
       box.replaceChildren(
         h('div', { class: 'sy-who' },
@@ -289,5 +306,7 @@
   });
   if (document.readyState === 'complete') start(); else window.addEventListener('load', start);
 
-  window.Sync = { section, sync, merge, renderButton, signedIn: () => !!user, user: () => user, _test: { merge, mergeKey } };
+  window.Sync = { section, sync, merge, renderButton, signedIn: () => !!user, user: () => user,
+    state: () => ({ busy, err: lastErr && lastErr !== 'pro' ? lastErr : '', locked: lastErr === 'pro' || locked(), at: lastSync() }),
+    _test: { merge, mergeKey } };
 })();

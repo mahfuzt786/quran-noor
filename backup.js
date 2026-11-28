@@ -103,6 +103,7 @@
 
     const saveBtn = h('button', { class: 'btn gold' }, '⬇ ' + t('bk_save'));
     saveBtn.addEventListener('click', async () => {
+      if (window.Pro && !window.Pro.need('backup')) return;
       busy(saveBtn, true);
       try { const f = await makeFile(voiceBox?.checked); download(f, f.name); } catch { toast(t('bk_fail')); busy(saveBtn, false); return; }
       noteBackedUp(); busy(saveBtn, false); toast(t('bk_saved'));
@@ -114,6 +115,7 @@
     try {
       if (navigator.canShare && navigator.canShare({ files: [new File(['{}'], 'x.json', { type: 'application/json' })] })) {
         shareBtn = h('button', { class: 'btn', onclick: async () => {
+          if (window.Pro && !window.Pro.need('backup')) return;
           busy(shareBtn, true);
           try { const f = await makeFile(voiceBox?.checked); await navigator.share({ files: [f], title: t('bk_title') }); noteBackedUp(); toast(t('bk_saved')); }
           catch (e) { if (e && e.name !== 'AbortError') toast(t('bk_fail')); }
@@ -123,7 +125,7 @@
     } catch { /* sharing files not supported */ }
 
     const picker = h('input', { type: 'file', accept: '.json,application/json', hidden: true, onchange: () => { const f = picker.files[0]; picker.value = ''; if (f) readFile(f); } });
-    const loadBtn = h('button', { class: 'btn', onclick: () => picker.click() }, '⬆ ' + t('bk_load'));
+    const loadBtn = h('button', { class: 'btn', onclick: () => { if (window.Pro && !window.Pro.need('backup')) return; picker.click(); } }, '⬆ ' + t('bk_load'));
 
     async function readFile(f) {
       let b;

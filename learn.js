@@ -298,7 +298,27 @@
         h('div', { class: 'row' }, h('a', { class: 'btn', href: '#/s/112' }, L('Practise on Al-Ikhlas →', 'ছুৰা ইখলাছত অনুশীলন কৰক →')))));
 
     const TABS = [['Letters', 'আখৰ', tabLetters], ['Vowel marks', 'স্বৰচিন', tabMarks], ['Joining', 'জোৰা লগোৱা', tabJoin], ['Reading rules', 'পঢ়াৰ নিয়ম', tabRules], ['Word building', 'শব্দ গঠন', tabBuild], ['Common words', 'সঘন শব্দ', tabCommon], ['Writing', 'লিখা', () => window.NoorWrite.tab(body, { h, L, num, LET, forms, D, sayWord, store, burst, AS })], ['Practice', 'অনুশীলন', tabPractice]];
-    const tabs = h('div', { class: 'ltabs' }, TABS.map(([en, as, fn], i) => h('button', { class: 'chip ltab', onclick: (e) => { $$('.ltab', tabs).forEach(b => b.classList.remove('on')); e.currentTarget.classList.add('on'); store.set('learnTab', i); fn(); body.classList.remove('fadein'); void body.offsetWidth; body.classList.add('fadein'); } }, num(i + 1) + '. ' + L(en, as))));
+    // chapters after the first Pro.LEARN_FREE are part of full access: shown blurred, with the unlock offer on top
+    const Pro = window.Pro, FREE_N = Pro ? Pro.LEARN_FREE : TABS.length;
+    const isLocked = (i) => !!Pro && i >= FREE_N && !Pro.unlocked();
+    const lockOver = () => h('div', { class: 'lk-over' }, h('div', { class: 'lk-card' },
+      h('div', { class: 'lk-ic', 'aria-hidden': 'true' }, '🔒'),
+      h('h3', {}, L('Chapters 5–8 are part of full access', 'অধ্যায় ৫–৮ সম্পূৰ্ণ সুবিধাৰ অংশ')),
+      h('p', {}, L(`Chapters 1–${FREE_N} are free. A one-time payment unlocks word building, common words, writing and the practice drills — plus every other practice tool.`,
+        `অধ্যায় ১–${num(FREE_N)} বিনামূলীয়া। এবাৰ পেমেণ্ট কৰিলে শব্দ গঠন, সঘন শব্দ, লিখা আৰু অনুশীলন খোলে — লগতে আন সকলো অনুশীলন সঁজুলি।`)),
+      h('div', { class: 'row' },
+        h('button', { class: 'btn gold', onclick: () => Pro.offer('learn') }, '🔓 ' + L('Unlock full access', 'সম্পূৰ্ণ সুবিধা খোলক')),
+        h('button', { class: 'btn', onclick: () => $$('.ltab', tabs)[0].click() }, L('Back to chapter 1', 'অধ্যায় ১-লৈ উভতি যাওক')))));
+    const tabs = h('div', { class: 'ltabs' }, TABS.map(([en, as, fn], i) => h('button', { class: 'chip ltab' + (isLocked(i) ? ' lk' : ''), onclick: (e) => {
+      $$('.ltab', tabs).forEach(b => b.classList.remove('on')); e.currentTarget.classList.add('on'); store.set('learnTab', i);
+      body.classList.remove('locked'); fn();
+      if (isLocked(i)) {
+        [...body.children].forEach(c => { c.inert = true; c.setAttribute('aria-hidden', 'true'); });
+        body.classList.add('locked'); body.append(lockOver());
+        if (e.isTrusted) Pro.offer('learn');           // a real tap on a locked chapter: show the payment popup
+      }
+      body.classList.remove('fadein'); void body.offsetWidth; body.classList.add('fadein');
+    } }, isLocked(i) ? h('span', { class: 'lk-tag', 'aria-label': L('locked', 'বন্ধ') }, '🔒 ') : null, num(i + 1) + '. ' + L(en, as))));
     app.replaceChildren(
       h('section', { class: 'shead' }, h('div', { class: 'shead-art', html: Scenes.forSurah(96) }), h('div', { class: 'shead-in' },
         h('div', { class: 'shead-txt' }, h('div', { class: 'sub' }, L('Chapter 1 · for beginners', 'অধ্যায় 1 · নতুন শিকাৰুৰ বাবে')), h('h1', {}, L('Learn to read Arabic', 'আৰবী পঢ়িবলৈ শিকক')),

@@ -8,6 +8,7 @@
   const N = () => window.Noor;
   const icons = {
     mic: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
+    micBig: '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
     speaker: '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4z"/></svg>'
   };
 
@@ -102,11 +103,12 @@
     r.cancelled = !!cancel;
     if (cancel) r.voice?.stop(true);
     try { cancel ? r.rec.abort() : r.rec.stop(); } catch { /* already stopped */ }
-    if (cancel) { r.panel?.remove(); run = null; }
+    if (cancel) { r.panel?.remove(); unlight(r.card); run = null; }
   }
 
+  const unlight = (card) => card?.querySelectorAll('.rc-hear').forEach(w => w.classList.remove('rc-hear'));
   function clearMarks(card) {
-    card.querySelectorAll('.w').forEach(w => w.classList.remove('rc-ok', 'rc-close', 'rc-wrong', 'rc-missed'));
+    card.querySelectorAll('.w').forEach(w => w.classList.remove('rc-ok', 'rc-close', 'rc-wrong', 'rc-missed', 'rc-hear'));
     card.querySelectorAll('.rc-pct').forEach(x => x.remove());
   }
 
@@ -198,13 +200,21 @@
     clearMarks(card); card.querySelector('.rc')?.remove();
     const words = v.w.filter(w => !w.end);
 
+    const { num } = N();
+    const els = [...card.querySelectorAll('.w')];
     const live = h('div', { class: 'rc-live', dir: 'rtl', lang: 'ar' }, h('span', { class: 'muted' }, t('rc_waiting')));
+    const secs = h('span', { class: 'rc-secs', 'aria-hidden': 'true' }, num('0:00'));
+    const fill = h('i'), heardN = h('span', { class: 'rc-heardn' }, t('rc_heard_n', 0, words.length));
     const panel = h('div', { class: 'rc rc-listening', role: 'status' },
-      h('div', { class: 'rc-head' }, h('span', { class: 'rc-dot', 'aria-hidden': 'true' }), h('b', {}, t('rc_listen')),
-        h('span', { class: 'sp' }),
-        h('button', { class: 'btn sm gold', onclick: () => stop(false) }, t('rc_done')),
-        h('button', { class: 'btn sm', onclick: () => stop(true) }, t('rc_cancel'))),
-      live, h('p', { class: 'muted small' }, t('rc_hint')),
+      h('div', { class: 'rc-lhead' },
+        h('span', { class: 'rc-mic', 'aria-hidden': 'true', html: icons.micBig }),
+        h('span', { class: 'rc-ltxt' }, h('b', {}, t('rc_listen_n', v.n)), h('span', { class: 'muted small' }, t('rc_hint2'))),
+        secs),
+      h('div', { class: 'rc-prog' }, h('div', { class: 'rc-bar' }, fill), heardN),
+      h('div', { class: 'rc-hears' }, h('span', { class: 'muted small' }, t('rc_hears')), live),
+      h('div', { class: 'row left rc-lbtns' },
+        h('button', { class: 'btn gold', onclick: () => stop(false) }, '✓ ' + t('rc_done2')),
+        h('button', { class: 'btn', onclick: () => stop(true) }, t('rc_cancel'))),
       canRecord() ? h('label', { class: 'rc-rectog' },
         h('input', { type: 'checkbox', checked: recOn() || null, onchange: (e) => {
           const { store } = N(); store.set('recVoice', e.target.checked); if (e.target.checked) store.set('recConflict', false);
@@ -214,7 +224,7 @@
 
     const SR = getSR(), rec = new SR();
     rec.lang = 'ar-SA'; rec.continuous = true; rec.interimResults = true; rec.maxAlternatives = 1;
-    run = { rec, i, panel, finalText: '', interim: '', last: Date.now(), heardAny: false, started: Date.now(), error: null, voice: null };
+    run = { rec, i, panel, card, finalText: '', interim: '', last: Date.now(), heardAny: false, started: Date.now(), error: null, voice: null };
     const me = run;
     rec.onresult = (e) => {
       let interim = '';
@@ -223,14 +233,27 @@
         if (e.results[k].isFinal) me.finalText += ' ' + tx; else interim += ' ' + tx;
       }
       me.interim = interim; me.last = Date.now(); me.heardAny = true;
-      live.textContent = (me.finalText + ' ' + interim).trim() || t('rc_waiting');
+      const so = (me.finalText + ' ' + interim).trim();
+      live.textContent = so || t('rc_waiting');
+      // light up the verse's words as they are heard
+      if (so && window.ReciteCore) {
+        let n = 0;
+        try {
+          window.ReciteCore.compare(words.map(w => w.t), so).words.forEach((x, k) => {
+            const on = x.status === 'ok' || x.status === 'close'; if (on) n++;
+            els[k] && els[k].classList.toggle('rc-hear', on);
+          });
+        } catch { /* keep going without highlights */ }
+        fill.style.width = Math.round(n / Math.max(1, words.length) * 100) + '%';
+        heardN.textContent = t('rc_heard_n', n, words.length);
+      }
     };
     rec.onerror = (e) => { me.error = e.error; };
     rec.onend = () => {
       clearInterval(me.timer);
       if (run === me) run = null;
       if (me.cancelled) return;
-      panel.remove();
+      panel.remove(); unlight(card);
       const heard = (me.finalText + ' ' + me.interim).trim();
       const hadVoice = !!me.voice;
       me.voice?.stop(!heard);
@@ -247,6 +270,8 @@
     // stop by itself after a pause in speech, or after a generous time limit
     const limit = 15000 + words.length * 1800;
     me.timer = setInterval(() => {
+      const el = Math.floor((Date.now() - me.started) / 1000);
+      secs.textContent = num(Math.floor(el / 60) + ':' + String(el % 60).padStart(2, '0'));
       const quiet = Date.now() - me.last;
       if ((me.heardAny && quiet > 2600) || Date.now() - me.started > limit) stop(false);
     }, 300);
@@ -270,7 +295,8 @@
     const best = store.get('rc', {}), vk = cur.verses[i].key;
     best[vk] = Math.max(best[vk] || 0, Math.round(r.score * 100)); store.set('rc', best);
     window.Review?.result('v:' + vk, r.score === 1 ? 'good' : r.score >= .7 ? 'hard' : 'again');
-    card.querySelector('.vmic')?.classList.toggle('passed', best[vk] === 100);
+    const vm = card.querySelector('.vmic');
+    if (vm) { vm.classList.toggle('passed', best[vk] === 100); vm.querySelector('.vmic-pct')?.remove(); vm.append(pctTag(best[vk])); }
 
     const label = { close: t('rc_close'), wrong: t('rc_wrong'), missed: t('rc_missed') };
     const mistakes = r.words.map((res, k) => ({ res, w: words[k] })).filter(x => x.res.status !== 'ok');
@@ -310,7 +336,30 @@
     N().touchDay(); N().log('rc', r.score * 100);
   }
 
-  window.Recite = { voice: Voice, voicePlayer, start, stop: () => { stop(true); if (short) { try { short.rec.abort(); } catch { /* ignore */ } short = null; } }, supported: () => !!getSR(), icons, ensureReady, listen, speak };
+  /** The best score shown on a verse's mic button. */
+  function pctTag(p) {
+    const { h, t, num } = N();
+    return h('span', { class: 'vmic-pct' + (p === 100 ? ' full' : p >= 70 ? ' mid' : ''), title: t('rc_best', num(p) + '%') }, (p === 100 ? '✓ ' : '') + num(p) + '%');
+  }
+
+  /** "How it works" card above the verses; hidden for good once dismissed. */
+  function introCard(firstIndex) {
+    const { h, t, store, num } = N();
+    if (!getSR() || store.get('rcIntroHide', false)) return null;
+    const step = (n, body) => h('li', { class: 'rci-step' }, h('span', { class: 'rci-n' }, num(n)), body);
+    const card = h('section', { class: 'rci', 'aria-label': t('rc_intro_t') },
+      h('div', { class: 'rci-head' }, h('span', { class: 'rci-ic', html: icons.micBig }), h('h2', {}, t('rc_intro_t'))),
+      h('ol', { class: 'rci-steps' },
+        step(1, h('span', {}, t('rc_intro_1a'), ' ', h('span', { class: 'rci-pill' }, h('span', { html: icons.mic }), h('span', { class: 'vmic-l' }, t('rc_btn')), h('span', { class: 'vmic-s' }, t('rc_btn_s'))), ' ', t('rc_intro_1b'))),
+        step(2, h('span', {}, t('rc_intro_2'))),
+        step(3, h('span', {}, t('rc_intro_3')))),
+      h('div', { class: 'row left' },
+        h('button', { class: 'btn gold', onclick: () => start(firstIndex || 0) }, h('span', { html: icons.mic }), t('rc_intro_try', (firstIndex || 0) + 1)),
+        h('button', { class: 'btn', onclick: () => { store.set('rcIntroHide', true); card.remove(); } }, t('rc_intro_hide'))));
+    return card;
+  }
+
+  window.Recite = { introCard, pctTag, voice: Voice, voicePlayer, start, stop: () => { stop(true); if (short) { try { short.rec.abort(); } catch { /* ignore */ } short = null; } }, supported: () => !!getSR(), icons, ensureReady, listen, speak };
   // voices load asynchronously in some browsers
   try { window.speechSynthesis && window.speechSynthesis.getVoices(); } catch { /* ignore */ }
 })();

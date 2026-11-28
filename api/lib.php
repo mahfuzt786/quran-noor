@@ -61,6 +61,12 @@ function is_pro(PDO $pdo, string $sub): bool {
     return (bool)$q->fetchColumn();
 }
 
+/** Payments are switched on once the Razorpay webhook secret is on the server; until then nothing is locked. */
+function paywall_ready(array $cfg): bool {
+    $f = $cfg['rzp_webhook_secret_file'] ?? '';
+    return $f !== '' && is_readable($f) && trim((string)file_get_contents($f)) !== '';
+}
+
 function is_admin(array $cfg, ?array $u): bool {
     if (!$u || empty($u['email'])) return false;
     return in_array(norm_email((string)$u['email']), array_map('norm_email', $cfg['admin_emails'] ?? []), true);

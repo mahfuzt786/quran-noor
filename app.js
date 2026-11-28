@@ -14,6 +14,11 @@
   const CACHE = 'noor-data-' + DATA_V;
 
   /* ---------- helpers ---------- */
+  // like h(), DOM insertion skips empty slots (null / undefined / false) instead of printing "null"
+  for (const P of [Element.prototype, DocumentFragment.prototype]) for (const m of ['replaceChildren', 'append', 'prepend']) {
+    const orig = P[m]; if (!orig || orig.__noor) continue;
+    const f = function (...k) { return orig.apply(this, k.filter(x => x != null && x !== false)); }; f.__noor = true; P[m] = f;
+  }
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   function h(tag, attrs, ...kids) {
@@ -510,7 +515,8 @@
       h('div', { class: 'vhead' },
         h('span', { class: 'vnum' }, num(v.n)), h('span', { class: 'vkey' }, num(v.key)),
         h('button', { class: 'vmic' + ((store.get('rc', {})[v.key] || 0) === 100 ? ' passed' : ''), title: t('rc_btn'), 'aria-label': t('rc_btn') + ' ' + num(v.n), onclick: () => window.Recite.start(i) },
-          h('span', { html: window.Recite ? window.Recite.icons.mic : '' }), h('span', { class: 'vmic-l' }, t('rc_btn'))),
+          h('span', { html: window.Recite ? window.Recite.icons.mic : '' }), h('span', { class: 'vmic-l' }, t('rc_btn')), h('span', { class: 'vmic-s' }, t('rc_btn_s')),
+          store.get('rc', {})[v.key] != null && window.Recite ? window.Recite.pctTag(store.get('rc', {})[v.key]) : null),
         window.Bookmarks ? window.Bookmarks.button(v) : null,
         h('button', { class: 'vplay', title: t('play_from', v.n), 'aria-label': t('play_from', v.n), onclick: () => play(i) },
           h('span', { html: '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>' }))),
@@ -585,6 +591,7 @@
             h('div', { class: 'seg' }, h('button', { 'aria-label': t('smaller'), onclick: () => size(-3) }, S.lang === 'as' ? 'অ−' : 'A−'), h('button', { 'aria-label': t('larger'), onclick: () => size(3) }, S.lang === 'as' ? 'অ+' : 'A+'))),
           h('div', { class: 'tgroup tg-end' },
             h('button', { class: 'btn sm', onclick: startTimer }, '⏱ ' + t('time_me')), h('button', { class: 'btn sm gold', onclick: startQuiz }, '✦ ' + t('quiz')))),
+        window.Recite?.introCard ? window.Recite.introCard(resume) : null,
         meta.bism ? h('div', { class: 'bism', dir: 'rtl', lang: 'ar' }, BISMILLAH, h('small', { dir: 'ltr', lang: 'as' }, t('bism_as'))) : null,
         verses,
         h('div', { class: 'endcard' }, h('h3', {}, t('end_t')), h('p', {}, t('end_d')),

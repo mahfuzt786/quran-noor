@@ -1,6 +1,7 @@
 /* Full access: Recite & check, Memorisation and Smart review of verses are free for Al-Fatiha and the 10
-   shortest surahs; a one-time payment (₹49 / $2.99 on Razorpay Payment Pages) unlocks them for all 114.
-   Everything else stays free. The payment is tied to the Google account (api/pay.php + sync.php). */
+   shortest surahs, and the first 4 chapters of Learn to read are free. A one-time payment (₹49 / $2.99 on
+   Razorpay Payment Pages) unlocks all of that plus offline downloads, backup files and sync across devices.
+   Reading, listening and meanings stay free. The payment is tied to the Google account (api/pay.php + sync.php). */
 (function () {
   'use strict';
   const N = () => window.Noor;
@@ -12,8 +13,10 @@
   // nothing is locked until payments are set up on the server (Razorpay webhook secret in place)
   const ready = () => N().store.get('payReady', false);
   const allowed = (surahId) => !ready() || FREE.has(+surahId) || has();
+  const unlocked = () => !ready() || has();
+  const LEARN_FREE = 4;   // Learn to read chapters 1-4 are free, 5-8 need full access
   fetch('api/sync.php?a=paywall', { cache: 'no-store', credentials: 'same-origin' })
-    .then(r => r.ok ? r.json() : null).then(j => { if (j && typeof j.ready === 'boolean') N().store.set('payReady', j.ready); }).catch(() => { });
+    .then(r => r.ok ? r.json() : null).then(j => { if (j && typeof j.ready === 'boolean' && j.ready !== N().store.get('payReady', false)) { N().store.set('payReady', j.ready); changed(); } }).catch(() => { });
   const defaultCurrency = () => {
     try { if (/^Asia\/(Kolkata|Calcutta)$/.test(Intl.DateTimeFormat().resolvedOptions().timeZone)) return 'INR'; } catch { /* ignore */ }
     return /-IN$/i.test(navigator.language || '') ? 'INR' : (N().lang() === 'as' ? 'INR' : 'USD');
@@ -29,9 +32,13 @@
     if (!u) return;
     const was = has();
     N().store.set('syncUser', u); N().store.set('syncPro', !!u.pro);
-    if (!was && u.pro) N().toast(N().t('pr_unlocked'));
-    listeners.forEach(f => { try { f(); } catch { /* gone */ } });
+    if (!was && u.pro) {
+      N().toast(N().t('pr_unlocked')); setTimeout(() => window.Sync?.sync(true), 500);
+      if (/^#\/learn/.test(location.hash)) setTimeout(() => window.dispatchEvent(new HashChangeEvent('hashchange')), 0);   // unlock chapters 5-8 now
+    }
+    changed();
   }
+  const changed = () => { listeners.forEach(f => { try { f(); } catch { /* gone */ } }); bar(); };
   const listeners = new Set();
 
   /** The unlock box (used in the prompt and on the Progress page). */
@@ -56,7 +63,7 @@
         if (r.status === 200) { setUser(r.j.user); draw(); return; }
         claimMsg.textContent = t(r.j.error === 'unknown' ? 'pr_claim_unknown' : r.j.error === 'taken' ? 'pr_claim_taken' : r.j.error === 'refunded' ? 'pr_refunded' : r.j.error === 'payment_id' ? 'pr_claim_bad' : 'sy_err');
       } }, t('pr_claim_btn'));
-      box.replaceChildren(
+      box.replaceChildren(...[
         h('p', {}, t('pr_includes')),
         h('p', { class: 'muted small' }, t('pr_free_list')),
         seg,
@@ -66,20 +73,60 @@
               h('p', { class: 'muted small' }, t('pr_email_note', user.email || '')))
           : h('div', { class: 'pr-pay' }, h('p', {}, t('pr_signin_first')), h('div', { class: 'pr-gbtn' }), opts.inModal ? null : null),
         h('p', { class: 'muted small' }, t('pr_once'), ' · ', h('a', { href: 'terms.html' }, t('pr_terms'))),
-        user ? h('details', { class: 'pr-claim' }, h('summary', {}, t('pr_claim_t')), h('div', { class: 'row left' }, claimIn, claim), claimMsg) : null);
+        user ? h('details', { class: 'pr-claim' }, h('summary', {}, t('pr_claim_t')), h('div', { class: 'row left' }, claimIn, claim), claimMsg) : null].filter(Boolean));
       if (!user) { const g = box.querySelector('.pr-gbtn'); window.Sync?.renderButton ? window.Sync.renderButton(g) : g.replaceChildren(h('a', { class: 'btn', href: '#/progress' }, t('sy_title'))); }
     };
     listeners.add(draw); draw();
     return box;
   }
 
-  /** Shown when a locked tool is opened. */
-  function offer() {
+  /** Shown when a locked tool is opened. kind says what was tried: tools (default), learn, offline, backup, sync. */
+  function offer(kind) {
     const { h, t, openModal } = N();
-    openModal(h('h2', {}, '🔓 ' + t('pr_locked_t')), h('p', {}, t('pr_locked_d')), offerBox({ inModal: true }));
+    const k = ['learn', 'offline', 'backup', 'sync'].includes(kind) ? kind : 'tools';
+    openModal(h('h2', {}, '🔓 ' + t('pr_locked_t')), h('p', {}, t('pr_need_' + k)), offerBox({ inModal: true }));
   }
   /** true if the tool may be used for this surah; otherwise shows the offer and returns false. */
   function gate(surahId) { if (allowed(surahId)) return true; offer(); return false; }
+  /** true if full access is there (or payments are not switched on); otherwise shows the offer for `kind`. */
+  function need(kind) { if (unlocked()) return true; offer(kind); return false; }
+
+  /* ---------- the account bar under the header, on every page ---------- */
+  const G_LOGO = '<svg viewBox="0 0 48 48" width="16" height="16" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>';
+  function signInModal() {
+    const { h, t, openModal } = N();
+    const g = h('div', { class: 'pr-gbtn' }, h('span', { class: 'muted small' }, '…'));
+    openModal(h('h2', {}, t('ac_signin_t')), h('p', {}, t('ac_signin_d')), g,
+      h('p', { class: 'muted small' }, t('sy_privacy'), ' ', h('a', { href: 'privacy.html', target: '_blank', rel: 'noopener' }, t('sy_privacy_link'))));
+    window.Sync?.renderButton ? window.Sync.renderButton(g) : g.replaceChildren(h('a', { class: 'btn', href: '#/progress' }, t('sy_title')));
+  }
+  function bar() {
+    const el = document.getElementById('acct'), Nn = window.Noor;
+    if (!el || !Nn || !Nn.h) return;
+    const { h, t, store } = Nn;
+    const user = store.get('syncUser', null), pro = has(), paywall = ready();
+    const first = user ? String(user.name || user.email || '').split(/[\s@]/)[0] : '';
+    const who = user
+      ? h('a', { class: 'acct-who', href: '#/progress', title: user.email || '' },
+          user.picture ? h('img', { src: user.picture, alt: '', width: '26', height: '26', referrerpolicy: 'no-referrer' }) : h('span', { class: 'acct-av' }, (first || '?')[0].toUpperCase()),
+          h('span', { class: 'acct-name' }, first))
+      : h('button', { class: 'acct-signin', onclick: signInModal }, h('span', { class: 'acct-g', html: G_LOGO }), t('ac_signin'));
+    let st, act = null;
+    if (pro) st = h('span', { class: 'acct-st ok' }, '✓ ' + t('ac_full'));
+    else if (paywall) {
+      st = h('span', { class: 'acct-st' }, h('b', {}, t('ac_free')), h('span', { class: 'acct-more' }, ' · ' + t('ac_free_d')));
+      act = h('button', { class: 'btn sm gold acct-unlock', onclick: () => offer() }, '🔓 ' + t('ac_unlock', PRICE[store.get('prCurrency', defaultCurrency())]));
+    } else st = h('span', { class: 'acct-st' }, user ? t('ac_synced_d') : t('ac_out_d'));
+    if (pro || !paywall) {
+      const s = window.Sync?.state ? window.Sync.state() : null;
+      if (user && s) act = h('a', { class: 'acct-sync' + (s.err ? ' err' : ''), href: '#/progress', title: t('sy_title') }, s.busy ? '⟳ ' + t('sy_busy') : s.err ? '⚠ ' + t('sy_title') : '☁ ' + t('ac_synced'));
+    }
+    el.replaceChildren(h('div', { class: 'acct-in' }, who, st, h('span', { class: 'sp' }), act));
+    el.hidden = false;
+    el.classList.toggle('pro', pro);
+  }
+  window.addEventListener('hashchange', () => setTimeout(bar, 0));
+  if (document.readyState === 'complete') setTimeout(bar, 0); else window.addEventListener('load', () => setTimeout(bar, 0));
 
   /** Progress page section. */
   function section() {
@@ -120,5 +167,5 @@
   }
   if (document.readyState === 'complete') returnFromPayment(); else window.addEventListener('load', returnFromPayment);
 
-  window.Pro = { FREE, has, allowed, ready, gate, offer, section, lockedCard, setUser, offerBox };
+  window.Pro = { FREE, LEARN_FREE, has, allowed, unlocked, ready, gate, need, offer, section, lockedCard, setUser, offerBox, bar, onChange: (f) => listeners.add(f) };
 })();
