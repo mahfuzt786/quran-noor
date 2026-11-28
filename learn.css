@@ -543,3 +543,44 @@ body:has(#player:not([hidden])) .upd { bottom: calc(108px + env(safe-area-inset-
 .vmic-pct.mid { background: color-mix(in srgb, var(--warn) 20%, transparent); color: var(--warn); }
 .vmic-pct.full { background: color-mix(in srgb, var(--ok) 20%, transparent); color: var(--ok); }
 @media (max-width: 760px) { .vmic .vmic-s, .rci-pill .vmic-s { display: inline; } .rci-pill .vmic-l { display: none; } }
+
+/* ============ homepage ============ */
+.hm-feats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.hm-feat { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg, 20px); padding: 18px; }
+.hm-feat h3 { margin: 8px 0 4px; font-size: 17px; }
+.hm-feat p { margin: 0; color: var(--muted); font-size: 14.5px; line-height: 1.55; }
+.hm-ic { font-size: 26px; }
+.hm-plans { display: grid; grid-template-columns: 1fr 1.25fr; gap: 14px; align-items: start; }
+.hm-plan { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg, 20px); padding: 20px; }
+.hm-plan-pro { border-color: var(--gold); box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold) 14%, transparent); }
+.hm-plan-pro.have { border-color: var(--teal); box-shadow: none; }
+.hm-plan-h { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-bottom: 8px; }
+.hm-plan-h h3 { margin: 0; font-size: 19px; }
+.hm-price { font-size: 22px; color: var(--gold); }
+.hm-list { margin: 0 0 16px; padding: 0; list-style: none; }
+.hm-list li { position: relative; padding: 5px 0 5px 26px; font-size: 14.5px; }
+.hm-list li::before { content: "✓"; position: absolute; left: 4px; color: var(--teal); font-weight: 900; }
+.hm-plan .pr-box { border-top: 1px solid var(--line); padding-top: 14px; }
+.hm-pols { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.hm-pol { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); color: var(--text); }
+.hm-pol:hover { border-color: var(--gold); }
+.hm-pol span { color: var(--muted); font-size: 13px; line-height: 1.45; word-break: break-word; }
+@media (max-width: 980px) { .hm-feats { grid-template-columns: repeat(2, 1fr); } .hm-pols { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 760px) { .hm-plans { grid-template-columns: 1fr; } }
+@media (max-width: 520px) { .hm-feats, .hm-pols { grid-template-columns: 1fr; } }
+
+.pg-moved { display: flex; align-items: center; gap: 14px; margin: 22px 0 0; padding: 16px 18px; border-radius: var(--r-lg, 20px); background: var(--card); border: 1px solid var(--line); color: var(--text); }
+.pg-moved > span:first-child { font-size: 26px; }
+.pg-moved > span:nth-child(2) { display: flex; flex-direction: column; flex: 1; }
+.pg-moved:hover { border-color: var(--gold); }
+
+/* the "before you pay" popup */
+.pc-sum { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; margin: 6px 0 12px; }
+.pc-row { display: flex; justify-content: space-between; gap: 14px; padding: 9px 14px; font-size: 14px; }
+.pc-row + .pc-row { border-top: 1px solid var(--line); }
+.pc-row b { text-align: right; word-break: break-word; }
+.pc-agree { display: flex; gap: 10px; align-items: flex-start; margin: 12px 0 14px; padding: 12px 14px; border-radius: 12px; background: var(--bg2); font-size: 14px; cursor: pointer; }
+.pc-agree input { width: 18px; height: 18px; margin-top: 2px; flex: none; accent-color: var(--gold); }
+.btn[disabled] { opacity: .45; cursor: not-allowed; }
+.pc-agree a { color: var(--gold); text-decoration: underline; text-underline-offset: 2px; }
+#app .sec[id] { scroll-margin-top: 76px; }

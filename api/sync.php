@@ -30,7 +30,7 @@ function fail(int $code, string $err): void {
     out($code, ['error' => $err]);
 }
 function back_to_app(string $result): void {
-    header('Location: ' . cookie_path() . '?signin=' . $result . '#/progress', true, 303);
+    header('Location: ' . cookie_path() . '?signin=' . $result . '#/home/sync', true, 303);
     exit;
 }
 

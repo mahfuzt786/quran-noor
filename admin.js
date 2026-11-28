@@ -92,7 +92,7 @@
 
     async function load(after) {
       const r = await api('admin').catch(() => ({ status: 0, j: {} }));
-      if (r.status === 401) return body.replaceChildren(h('div', { class: 'endcard' }, h('p', {}, t('ad_signin')), h('a', { class: 'btn gold', href: '#/progress' }, t('sy_title'))));
+      if (r.status === 401) return body.replaceChildren(h('div', { class: 'endcard' }, h('p', {}, t('ad_signin')), h('a', { class: 'btn gold', href: '#/home/sync' }, t('sy_title'))));
       if (r.status === 403) return body.replaceChildren(h('div', { class: 'endcard' }, h('p', {}, t('ad_denied'))));
       if (r.status !== 200) return body.replaceChildren(h('div', { class: 'err' }, t('sy_err')));
       draw(r.j); after && after();

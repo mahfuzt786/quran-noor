@@ -16,7 +16,7 @@
   const unlocked = () => !ready() || has();
   const LEARN_FREE = 4;   // Learn to read chapters 1-4 are free, 5-8 need full access
   fetch('api/sync.php?a=paywall', { cache: 'no-store', credentials: 'same-origin' })
-    .then(r => r.ok ? r.json() : null).then(j => { if (j && typeof j.ready === 'boolean' && j.ready !== N().store.get('payReady', false)) { N().store.set('payReady', j.ready); changed(); } }).catch(() => { });
+    .then(r => r.ok ? r.json() : null).then(j => { if (j && typeof j.ready === 'boolean' && j.ready !== N().store.get('payReady', false)) { N().store.set('payReady', j.ready); changed(); if (/^(#\/?)?$|^#\/(home|learn)/.test(location.hash)) window.dispatchEvent(new HashChangeEvent('hashchange')); } }).catch(() => { });
   const defaultCurrency = () => {
     try { if (/^Asia\/(Kolkata|Calcutta)$/.test(Intl.DateTimeFormat().resolvedOptions().timeZone)) return 'INR'; } catch { /* ignore */ }
     return /-IN$/i.test(navigator.language || '') ? 'INR' : (N().lang() === 'as' ? 'INR' : 'USD');
@@ -64,20 +64,47 @@
         claimMsg.textContent = t(r.j.error === 'unknown' ? 'pr_claim_unknown' : r.j.error === 'taken' ? 'pr_claim_taken' : r.j.error === 'refunded' ? 'pr_refunded' : r.j.error === 'payment_id' ? 'pr_claim_bad' : 'sy_err');
       } }, t('pr_claim_btn'));
       box.replaceChildren(...[
-        h('p', {}, t('pr_includes')),
-        h('p', { class: 'muted small' }, t('pr_free_list')),
+        opts.compact ? null : h('p', {}, t('pr_includes')),
+        opts.compact ? null : h('p', { class: 'muted small' }, t('pr_free_list')),
         seg,
         user
           ? h('div', { class: 'pr-pay' },
-              h('a', { class: 'btn gold', href: PAGES[cur] + '?email=' + encodeURIComponent(user.email || ''), rel: 'noopener', onclick: () => store.set('prPending', Date.now()) }, t('pr_pay', PRICE[cur])),
+              h('button', { class: 'btn gold', onclick: () => payConsent(cur, user) }, t('pr_pay', PRICE[cur])),
               h('p', { class: 'muted small' }, t('pr_email_note', user.email || '')))
           : h('div', { class: 'pr-pay' }, h('p', {}, t('pr_signin_first')), h('div', { class: 'pr-gbtn' }), opts.inModal ? null : null),
         h('p', { class: 'muted small' }, t('pr_once'), ' · ', h('a', { href: 'terms.html' }, t('pr_terms'))),
         user ? h('details', { class: 'pr-claim' }, h('summary', {}, t('pr_claim_t')), h('div', { class: 'row left' }, claimIn, claim), claimMsg) : null].filter(Boolean));
-      if (!user) { const g = box.querySelector('.pr-gbtn'); window.Sync?.renderButton ? window.Sync.renderButton(g) : g.replaceChildren(h('a', { class: 'btn', href: '#/progress' }, t('sy_title'))); }
+      if (!user) { const g = box.querySelector('.pr-gbtn'); window.Sync?.renderButton ? window.Sync.renderButton(g) : g.replaceChildren(h('a', { class: 'btn', href: '#/home/sync' }, t('sy_title'))); }
     };
     listeners.add(draw); draw();
     return box;
+  }
+
+  /** Before going to Razorpay: what is bought, for which account, how it is delivered, the refund rule,
+      and agreement to the terms, privacy policy and refund policy (required to continue). */
+  function payConsent(cur, user) {
+    const { h, t, store, openModal, closeModal } = N();
+    const go = h('button', { class: 'btn gold', disabled: true, onclick: () => {
+      store.set('prPending', Date.now()); store.set('prAgreed', { at: Date.now(), cur, email: user.email || '' });
+      location.href = PAGES[cur] + '?email=' + encodeURIComponent(user.email || '');
+    } }, '🔒 ' + t('pr_pay', PRICE[cur]));
+    const tick = h('input', { type: 'checkbox', id: 'prAgree', onchange: (e) => { go.disabled = !e.target.checked; } });
+    const link = (href, k) => h('a', { href, target: '_blank', rel: 'noopener' }, t(k));
+    const row = (k, v) => h('div', { class: 'pc-row' }, h('span', { class: 'muted' }, t(k)), h('b', {}, v));
+    openModal(
+      h('h2', {}, t('pc_t')),
+      h('div', { class: 'pc-sum' },
+        row('pc_item', t('pc_item_v')),
+        row('pc_price', PRICE[cur] + ' · ' + t('pc_once')),
+        row('pc_account', user.email || ''),
+        row('pc_delivery', t('pc_delivery_v')),
+        row('pc_refund', t('pc_refund_v'))),
+      h('p', { class: 'muted small' }, t('pr_includes')),
+      h('p', { class: 'muted small' }, t('pc_razorpay')),
+      h('label', { class: 'pc-agree', for: 'prAgree' }, tick,
+        h('span', {}, t('pc_agree_a'), ' ', link('terms.html', 'hm_terms'), ', ', link('privacy.html', 'sy_privacy_link'), ' ', t('pc_and'), ' ', link('refund.html', 'hm_refund'), t('pc_agree_b'))),
+      h('div', { class: 'row' }, go, h('button', { class: 'btn', onclick: closeModal }, t('rc_cancel'))),
+      h('p', { class: 'muted small center' }, t('hm_contact') + ': ', h('a', { href: 'mailto:mahfuzz786@gmail.com' }, 'mahfuzz786@gmail.com'), ' · +91 96788 38912'));
   }
 
   /** Shown when a locked tool is opened. kind says what was tried: tools (default), learn, offline, backup, sync. */
@@ -98,7 +125,7 @@
     const g = h('div', { class: 'pr-gbtn' }, h('span', { class: 'muted small' }, '…'));
     openModal(h('h2', {}, t('ac_signin_t')), h('p', {}, t('ac_signin_d')), g,
       h('p', { class: 'muted small' }, t('sy_privacy'), ' ', h('a', { href: 'privacy.html', target: '_blank', rel: 'noopener' }, t('sy_privacy_link'))));
-    window.Sync?.renderButton ? window.Sync.renderButton(g) : g.replaceChildren(h('a', { class: 'btn', href: '#/progress' }, t('sy_title')));
+    window.Sync?.renderButton ? window.Sync.renderButton(g) : g.replaceChildren(h('a', { class: 'btn', href: '#/home/sync' }, t('sy_title')));
   }
   function bar() {
     const el = document.getElementById('acct'), Nn = window.Noor;
@@ -107,7 +134,7 @@
     const user = store.get('syncUser', null), pro = has(), paywall = ready();
     const first = user ? String(user.name || user.email || '').split(/[\s@]/)[0] : '';
     const who = user
-      ? h('a', { class: 'acct-who', href: '#/progress', title: user.email || '' },
+      ? h('a', { class: 'acct-who', href: '#/home/sync', title: user.email || '' },
           user.picture ? h('img', { src: user.picture, alt: '', width: '26', height: '26', referrerpolicy: 'no-referrer' }) : h('span', { class: 'acct-av' }, (first || '?')[0].toUpperCase()),
           h('span', { class: 'acct-name' }, first))
       : h('button', { class: 'acct-signin', onclick: signInModal }, h('span', { class: 'acct-g', html: G_LOGO }), t('ac_signin'));
@@ -119,7 +146,7 @@
     } else st = h('span', { class: 'acct-st' }, user ? t('ac_synced_d') : t('ac_out_d'));
     if (pro || !paywall) {
       const s = window.Sync?.state ? window.Sync.state() : null;
-      if (user && s) act = h('a', { class: 'acct-sync' + (s.err ? ' err' : ''), href: '#/progress', title: t('sy_title') }, s.busy ? '⟳ ' + t('sy_busy') : s.err ? '⚠ ' + t('sy_title') : '☁ ' + t('ac_synced'));
+      if (user && s) act = h('a', { class: 'acct-sync' + (s.err ? ' err' : ''), href: '#/home/sync', title: t('sy_title') }, s.busy ? '⟳ ' + t('sy_busy') : s.err ? '⚠ ' + t('sy_title') : '☁ ' + t('ac_synced'));
     }
     el.replaceChildren(h('div', { class: 'acct-in' }, who, st, h('span', { class: 'sp' }), act));
     el.hidden = false;
@@ -131,7 +158,7 @@
   /** Progress page section. */
   function section() {
     const { h, t } = N();
-    return h('section', { class: 'sec pg-sec pr-sec', id: 'full-access' },
+    return h('section', { class: 'sec pg-sec pr-sec', id: 'full-access-box' },
       h('div', { class: 'sec-title' }, h('h2', {}, (has() ? '✓ ' : '🔓 ') + t('pr_title')), h('span', {}, t('pr_sub'))),
       h('div', { class: 'sy-card' }, offerBox()));
   }
@@ -150,8 +177,8 @@
     if (!u.searchParams.has('paid') && !u.searchParams.has('razorpay_payment_id')) return;
     const pid = u.searchParams.get('razorpay_payment_id') || '';
     [...u.searchParams.keys()].filter(k => k === 'paid' || k.startsWith('razorpay_')).forEach(k => u.searchParams.delete(k));
-    history.replaceState(history.state, '', u.pathname + u.search + (u.hash && u.hash !== '#/' ? u.hash : '#/progress'));
-    if (location.hash === '#/progress') window.dispatchEvent(new HashChangeEvent('hashchange'));
+    history.replaceState(history.state, '', u.pathname + u.search + '#/home/full-access');
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
     if (!N().store.get('syncUser', null)) return;
     N().toast(N().t('pr_waiting'));
     for (let i = 0; i < 30; i++) {

@@ -171,9 +171,7 @@
           : h('div', { class: 'endcard pg-empty' }, h('h3', {}, t('pg_empty_t')), h('p', {}, t('pg_empty')),
             h('div', { class: 'row' }, h('a', { class: 'btn gold', href: '#/s/1' }, t('pg_go_surah')), h('a', { class: 'btn', href: '#/learn' }, t('nav_learn')))),
         store.get('syncUser', null)?.admin ? h('p', { class: 'noor-adm-link' }, h('a', { class: 'btn sm', href: '#/admin' }, '⚙ ' + t('ad_title'))) : null,
-        window.Pro && window.Pro.ready() ? window.Pro.section() : null,
-        window.Sync ? window.Sync.section() : null,
-        window.Offline ? window.Offline.section() : null,
+        h('a', { class: 'pg-moved', href: '#/home/sync' }, h('span', { 'aria-hidden': 'true' }, '☁'), h('span', {}, h('b', {}, t('hm_moved_t')), h('span', { class: 'muted small' }, t('hm_moved_d'))), h('span', { class: 'btn sm' }, t('open'))),
         window.Backup ? window.Backup.section() : null,
         footer()));
   }

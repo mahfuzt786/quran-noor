@@ -441,7 +441,7 @@
   const isDone = (id) => { const p = S.prog[id]; return !!(p && (p.quiz >= 70 || p.listened)); };
   const footer = () => h('footer', { class: 'foot' },
     h('div', { class: 'foot-orn', 'aria-hidden': 'true' }, '۞'),
-    h('p', {}, t('foot')), h('p', { class: 'muted small' }, t('foot_credit')), h('p', { class: 'muted small' }, h('a', { href: 'privacy.html' }, t('sy_privacy_link')), ' · ', h('a', { href: 'terms.html' }, t('pr_terms'))));
+    h('p', {}, t('foot')), h('p', { class: 'muted small' }, t('foot_credit')), h('p', { class: 'muted small' }, h('a', { href: 'privacy.html' }, t('sy_privacy_link')), ' · ', h('a', { href: 'terms.html' }, t('hm_terms')), ' · ', h('a', { href: 'refund.html' }, t('hm_refund')), ' · ', h('a', { href: 'mailto:mahfuzz786@gmail.com' }, t('hm_contact'))));
 
   function viewHome() {
     document.title = t('title');
@@ -470,21 +470,16 @@
     const fchip = (key, label) => h('button', { class: 'chip' + (filter === key ? ' on' : ''), 'aria-pressed': String(filter === key), onclick: (e) => { filter = key; $$('.filters .chip').forEach(b => { b.classList.toggle('on', b === e.currentTarget); b.setAttribute('aria-pressed', String(b === e.currentTarget)); }); applyFilter(); } }, label);
 
     app.replaceChildren(
-      h('section', { class: 'hero' }, h('div', { class: 'hero-art', html: Scenes.hero() }), h('div', { class: 'hero-in' },
-        h('div', { class: 'salam' }, t('salam')),
-        h('h1', {}, t('hero_h1')),
-        h('p', {}, t('hero_p')),
-        h('div', { class: 'cta' },
-          h('a', { class: 'btn gold lg', href: '#/s/' + (last ? last.id : 1) }, last ? t('cta_continue', sname(last)) : t('cta_start')),
-          h('a', { class: 'btn glass', href: '#/learn' }, t('cta_learn')),
-          h('button', { class: 'btn glass', onclick: () => $('#all').scrollIntoView({ behavior: 'smooth' }) }, t('cta_all'))))),
+      h('section', { class: 'shead' }, h('div', { class: 'shead-art', html: Scenes.forSurah(1) }), h('div', { class: 'shead-in' },
+        h('div', { class: 'shead-txt' }, h('div', { class: 'sub' }, t('hm_surahs_sub')), h('h1', {}, t('nav_surahs')),
+          h('div', { class: 'row left shead-act' },
+            h('a', { class: 'btn gold', href: '#/s/' + (last ? last.id : 1) }, last ? t('cta_continue', sname(last)) : t('cta_start')),
+            h('button', { class: 'btn glass', onclick: () => $('#all').scrollIntoView({ behavior: 'smooth' }) }, '↓ ' + t('cta_all')))),
+        h('div', { class: 'arname', lang: 'ar', 'aria-hidden': 'true' }, 'القرآن'))),
       h('div', { class: 'wrap' },
-        window.Goals ? window.Goals.homeCard() : null,
         hasProgress ? h('div', { class: 'stats' },
           [[S.streak.n || 0, t('st_streak')], [known, t('st_words')], [practiced, t('st_surahs')], [best || '—', t('st_pace')]]
             .map(([b, s], i) => h('div', { class: 'stat', style: `animation-delay:${i * 80}ms` }, h('b', {}, num(b)), h('span', {}, s)))) : null,
-        window.Review ? window.Review.homeCard() : null,
-        window.Offline ? window.Offline.installCard(true) : null,
         h('section', { class: 'sec' },
           h('div', { class: 'sec-title' }, h('h2', {}, t('how_title')), h('span', {}, t('how_sub'))),
           h('div', { class: 'method' }, [['ear', 'how1'], ['echo', 'how2'], ['fast', 'how3'], ['heart', 'how4']]
@@ -530,7 +525,7 @@
   }
 
   async function viewSurah(id, focusVerse) {
-    const meta = S.chapters[id - 1]; if (!meta) { location.hash = '#/'; return; }
+    const meta = S.chapters[id - 1]; if (!meta) { location.hash = '#/surahs'; return; }
     document.title = `${sname(meta)} (${meta.ar}) · ${S.lang === 'as' ? 'নূৰ' : 'Noor'}`;
     const token = ++S.token;
     stopAll(); stopTimer(false);
@@ -633,7 +628,7 @@
     $('#navLearn').classList.toggle('on', hsh.startsWith('#/learn'));
     $('#navProgress').classList.toggle('on', /^#\/(progress|review)/.test(hsh));
     $('#navSaved').classList.toggle('on', hsh.startsWith('#/saved'));
-    $('#navSurahs').classList.toggle('on', !/^#\/(learn|progress|saved|review)/.test(hsh));
+    $('#navSurahs').classList.toggle('on', /^#\/s(\/|urahs)/.test(hsh));
   }
   async function route() {
     closeModal(); $('#tip').hidden = true; navActive(); window.Recite?.stop();
@@ -653,8 +648,11 @@
     if (location.hash.startsWith('#/review')) { document.title = t('rv_title') + (S.lang === 'as' ? ' · নূৰ' : ' · Noor'); $('#player').hidden = true; window.Review.view($('#app')); window.scrollTo(0, 0); return; }
     if (location.hash.startsWith('#/saved')) { document.title = t('bm_title') + (S.lang === 'as' ? ' · নূৰ' : ' · Noor'); $('#player').hidden = true; window.Bookmarks.view($('#app')); window.scrollTo(0, 0); return; }
     if (location.hash.startsWith('#/learn')) { document.title = t('nav_learn') + (S.lang === 'as' ? ' · নূৰ' : ' · Noor'); $('#player').hidden = true; window.Learn.view($('#app')); window.scrollTo(0, 0); return; }
-    viewHome();
-    window.scrollTo(0, 0);
+    if (location.hash.startsWith('#/surahs')) { viewHome(); window.scrollTo(0, 0); return; }
+    // the homepage: #/ (or nothing), and #/home/<section> to open it at full-access, sync or offline
+    document.title = t('title'); $('#player').hidden = true;
+    const hm = location.hash.match(/^#\/home\/([\w-]+)/);
+    window.Home.view($('#app'), hm ? hm[1] : '');
   }
 
   $('#themeBtn').onclick = () => { S.set.theme = S.set.theme === 'night' ? 'light' : 'night'; saveSet(); applyTheme(); };
@@ -671,5 +669,9 @@
     cur: () => S.cur, verseEl, pause, playOne, log: logPractice, chapters: () => S.chapters, sname, toast };
   applyTheme(); bindPlayer();
   window.addEventListener('hashchange', route);
-  route();
+  // first page once every script has run (sync.js and pro.js load after this file and the homepage needs them)
+  // (deferred scripts all run before DOMContentLoaded; 'load' and 'complete' are fallbacks if this file is ever loaded late)
+  let started = false; const first = () => { if (!started) { started = true; route(); } };
+  document.addEventListener('DOMContentLoaded', first, { once: true }); window.addEventListener('load', first, { once: true });
+  if (document.readyState === 'complete') first();
 })();
