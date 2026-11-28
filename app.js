@@ -110,10 +110,10 @@
 
   /* ---------- language ---------- */
   const I = window.NOOR_I18N;
-  function t(key, arg) {
+  function t(key, ...args) {
     const e = I[key]; if (!e) return key;
     const v = e[S.lang === 'as' ? 1 : 0];
-    const out = typeof v === 'function' ? v(arg) : v;
+    const out = typeof v === 'function' ? v(...args) : v;
     return S.lang === 'as' ? num(out) : out;
   }
   const AS_DIGITS = '০১২৩৪৫৬৭৮৯';
