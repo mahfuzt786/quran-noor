@@ -14,7 +14,7 @@
 
   function view(app) {
     const { h, t, footer, openModal, closeModal, toast } = N();
-    const body = h('div', { class: 'ad-body' }, h('div', { class: 'skeleton' }));
+    const body = h('div', { class: 'noor-adm-body' }, h('div', { class: 'skeleton' }));
     app.replaceChildren(
       h('section', { class: 'shead' }, h('div', { class: 'shead-art', html: window.Scenes.forSurah(67) }), h('div', { class: 'shead-in' },
         h('div', { class: 'shead-txt' }, h('div', { class: 'sub' }, t('ad_sub')), h('h1', {}, '⚙ ' + t('ad_title'))))),
@@ -55,13 +55,13 @@
       const grants = d.grants || [], pays = d.payments || [];
       const paid = pays.filter(p => p.status === 'captured');
       body.replaceChildren(
-        h('div', { class: 'stats ad-stats' },
+        h('div', { class: 'stats noor-adm-stats' },
           [[grants.length, t('ad_s_free')], [paid.length, t('ad_s_paid')], [d.counts?.users ?? 0, t('ad_s_users')]]
             .map(([b, s]) => h('div', { class: 'stat' }, h('b', {}, N().num(b)), h('span', {}, s)))),
 
         h('h2', { class: 'subh' }, t('ad_free_t')),
         h('p', { class: 'muted small' }, t('ad_free_d')),
-        h('div', { class: 'ad-add' }, email, note, add), msg,
+        h('div', { class: 'noor-adm-add' }, email, note, add), msg,
         grants.length
           ? h('div', { class: 'pg-tablewrap' }, h('table', { class: 'pg-rows' },
               h('thead', {}, h('tr', {}, [t('ad_c_email'), t('ad_c_note'), t('ad_c_added'), t('ad_c_seen'), ''].map(x => h('th', {}, x)))),
