@@ -460,7 +460,7 @@ body:has(#player:not([hidden])) .upd { bottom: calc(108px + env(safe-area-inset-
 .noor-adm-pager[hidden] { display: none; }
 
 .noor-adm-tabs { margin: 28px 0 0; }
-.noor-adm-tablist { display: flex; gap: 4px; border-bottom: 1px solid var(--line, rgba(255,255,255,.12)); margin: 0 0 14px; overflow-x: auto; }
+.noor-adm-tablist { display: flex; gap: 4px; border-bottom: 1px solid var(--line, rgba(255,255,255,.12)); margin: 0 0 14px; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
 .noor-adm-tab { appearance: none; background: none; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; padding: 10px 16px 11px;
   font: inherit; font-size: 17px; color: var(--muted, #9aa3c7); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
 .noor-adm-tab:hover { color: var(--text); }
