@@ -555,6 +555,8 @@ window.NOOR_I18N = {
   ad_no_match: ['Nothing matches your search.', 'বিচৰা মতে একো পোৱা নগ’ল।'],
   ad_showing: [(a, b, n) => `${a}–${b} of ${n}`, (a, b, n) => `${n}-ৰ ${a}–${b}`],
   ad_prev: ['Previous', 'আগৰ'], ad_next: ['Next', 'পিছৰ'],
+  ad_csv: ['Export CSV', 'CSV ডাউনলোড'],
+  ad_csv_d: ['Download every row that matches the search as a spreadsheet file', 'বিচৰা মতে মিলা সকলো শাৰী স্প্ৰেডশ্বীট ফাইল হিচাপে ডাউনলোড কৰক'],
   ad_pay_none: ['No payments yet.', 'এতিয়ালৈকে কোনো পেমেণ্ট নাই।'],
   ad_paid: ['paid', 'পেমেণ্ট হৈছে'], ad_refunded: ['refunded', 'টকা ঘূৰাই দিয়া'], ad_unlinked: ['not linked yet', 'এতিয়ালৈকে যুক্ত হোৱা নাই'],
 

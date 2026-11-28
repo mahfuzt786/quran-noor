@@ -21,12 +21,30 @@
   const money = (amount, cur) => (cur === 'INR' ? '₹' : cur === 'USD' ? '$' : cur + ' ') + N().num((amount / 100).toFixed(amount % 100 ? 2 : 0));
 
   const PER_PAGE = 15;
-  /* A table with a search box above it and page buttons below, 15 rows per page.
-     text(row) is what the search looks in; row(r) builds one <tr>. */
-  function paged(rows, heads, text, row, placeholder) {
+  /* CSV download. Plain digits and ISO dates so spreadsheets read it; a BOM so Excel keeps the Assamese/Unicode;
+     cells that start like a formula get a leading ' so a spreadsheet will not run them. */
+  const iso = (s) => s ? new Date(s * 1000).toISOString().replace('T', ' ').slice(0, 19) + ' UTC' : '';
+  function downloadCsv(name, cols, rows) {
+    const cell = (v) => {
+      let s = v == null ? '' : String(v);
+      if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+      return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+    };
+    const lines = [cols.map(c => cell(c[0])).join(','), ...rows.map(r => cols.map(c => cell(c[1](r))).join(','))];
+    const url = URL.createObjectURL(new Blob(['﻿' + lines.join('\r\n') + '\r\n'], { type: 'text/csv;charset=utf-8' }));
+    const a = Object.assign(document.createElement('a'), { href: url, download: `noor-${name}-${new Date().toISOString().slice(0, 10)}.csv` });
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  }
+
+  /* A table with a search box and an Export CSV button above it and page buttons below, 15 rows per page.
+     text(row) is what the search looks in; row(r) builds one <tr>; csv = {name, cols: [[heading, value(row)]]}.
+     Export takes every row that matches the search, not just the page on screen. */
+  function paged(rows, heads, text, row, placeholder, csv) {
     const { h, t } = N();
-    let q = '', page = 0;
+    let q = '', page = 0, hits = rows;
     const input = h('input', { class: 'bm-note noor-adm-search', type: 'search', placeholder, 'aria-label': placeholder });
+    const exp = h('button', { class: 'btn sm', title: t('ad_csv_d'), onclick: () => downloadCsv(csv.name, csv.cols, hits) }, '⬇ ' + t('ad_csv'));
     const tbody = h('tbody'), info = h('span', { class: 'muted small' });
     const prev = h('button', { class: 'btn sm', 'aria-label': t('ad_prev') }, '‹ ' + t('ad_prev'));
     const next = h('button', { class: 'btn sm', 'aria-label': t('ad_next') }, t('ad_next') + ' ›');
@@ -36,7 +54,7 @@
     const pager = h('div', { class: 'noor-adm-pager' }, info, h('span', { class: 'noor-adm-pbtns' }, prev, nums, next));
     function draw() {
       const words = q.toLowerCase().split(/\s+/).filter(Boolean);
-      const hits = words.length ? rows.filter(r => { const s = text(r).toLowerCase(); return words.every(w => s.includes(w)); }) : rows;
+      hits = words.length ? rows.filter(r => { const s = text(r).toLowerCase(); return words.every(w => s.includes(w)); }) : rows;
       const pages = Math.max(1, Math.ceil(hits.length / PER_PAGE));
       page = Math.min(page, pages - 1);
       const from = page * PER_PAGE, shown = hits.slice(from, from + PER_PAGE);
@@ -53,17 +71,20 @@
       });
       nums.replaceChildren(...parts);
       pager.hidden = pages < 2 && !words.length;
+      exp.disabled = !hits.length;
     }
     prev.onclick = () => { page--; draw(); };
     next.onclick = () => { page++; draw(); };
     input.addEventListener('input', () => { q = input.value; page = 0; draw(); });
     draw();
-    return h('div', { class: 'noor-adm-paged' }, input, wrap, empty, pager);
+    return h('div', { class: 'noor-adm-paged' }, h('div', { class: 'noor-adm-tools' }, input, exp), wrap, empty, pager);
   }
 
   function view(app) {
     const { h, t, footer, openModal, closeModal, toast } = N();
     const body = h('div', { class: 'noor-adm-body' }, h('div', { class: 'skeleton' }));
+    let tab = 'users';
+    try { tab = localStorage.getItem('noor.adminTab') || 'users'; } catch (e) { /* private mode */ }
     app.replaceChildren(
       h('section', { class: 'shead' }, h('div', { class: 'shead-art', html: window.Scenes.forSurah(67) }), h('div', { class: 'shead-in' },
         h('div', { class: 'shead-txt' }, h('div', { class: 'sub' }, t('ad_sub')), h('h1', {}, '⚙ ' + t('ad_title'))))),
@@ -122,7 +143,8 @@
                 h('td', {}, h('button', { class: 'btn sm', onclick: () => remove(g) }, t('ad_remove'))))))))
           : h('p', { class: 'muted' }, t('ad_free_none')),
 
-        h('h2', { class: 'subh' }, t('ad_users_t')),
+        tabs([
+          ['users', t('ad_users_t'), users.length, () => [
         h('p', { class: 'muted small' }, t('ad_users_d')),
         users.length
           ? paged(users, [t('ad_c_email'), t('ad_c_name'), t('ad_c_first'), t('ad_c_last'), t('ad_c_access'), t('ad_c_synced')],
@@ -132,10 +154,12 @@
                 h('td', {}, day(u.created)), h('td', {}, when(u.seen)),
                 h('td', {}, access(u)),
                 h('td', {}, u.synced ? day(u.synced) : '—')),
-              t('ad_search_users'))
-          : h('p', { class: 'muted' }, t('ad_users_none')),
+              t('ad_search_users'),
+              { name: 'accounts', cols: [['email', u => u.email], ['name', u => u.name], ['first_sign_in', u => iso(u.created)], ['last_active', u => iso(u.seen)],
+                ['access', u => +u.paid ? 'paid' : +u.granted ? 'free (granted)' : 'free part only'], ['progress_saved', u => iso(u.synced)]] })
+          : h('p', { class: 'muted' }, t('ad_users_none'))]],
 
-        h('h2', { class: 'subh' }, t('ad_pay_t')),
+          ['payments', t('ad_pay_t'), pays.length, () => [
         pays.length
           ? paged(pays, [t('ad_c_date'), t('ad_c_email'), t('ad_c_amount'), t('ad_c_status'), t('ad_c_account'), t('ad_c_id')],
               p => [p.email, p.account, p.id, p.currency, money(+p.amount, p.currency), status(p), day(p.created)].join(' '),
@@ -143,8 +167,32 @@
                 h('td', {}, day(p.created)), h('td', {}, p.email || '—'), h('td', {}, money(+p.amount, p.currency)),
                 h('td', {}, status(p)),
                 h('td', {}, p.account || t('ad_unlinked')), h('td', {}, h('code', {}, p.id))),
-              t('ad_search_pays'))
-          : h('p', { class: 'muted' }, t('ad_pay_none')));
+              t('ad_search_pays'),
+              { name: 'payments', cols: [['date', p => iso(p.created)], ['email', p => p.email], ['amount', p => (p.amount / 100).toFixed(2)], ['currency', p => p.currency],
+                ['status', p => p.status === 'captured' ? 'paid' : 'refunded'], ['unlocks_account', p => p.account || ''], ['payment_id', p => p.id]] })
+          : h('p', { class: 'muted' }, t('ad_pay_none'))]]]));
+    }
+
+    /* Tabs: [key, label, count, build()]. The chosen tab stays chosen when the page redraws after an add or remove. */
+    function tabs(list) {
+      const panel = h('div', { class: 'noor-adm-panel', role: 'tabpanel' });
+      const btns = list.map(([key, label, count]) => h('button', {
+        class: 'noor-adm-tab', role: 'tab', id: 'adm-tab-' + key, onclick: () => pick(key),
+        onkeydown: (ev) => {
+          if (ev.key !== 'ArrowRight' && ev.key !== 'ArrowLeft') return;
+          const i = list.findIndex(x => x[0] === key), j = (i + (ev.key === 'ArrowRight' ? 1 : list.length - 1)) % list.length;
+          pick(list[j][0]); btns[j].focus();
+        }
+      }, label, h('span', { class: 'noor-adm-count' }, N().num(count))));
+      function pick(key) {
+        if (!list.some(x => x[0] === key)) key = list[0][0];
+        tab = key; try { localStorage.setItem('noor.adminTab', key); } catch (e) { /* private mode */ }
+        list.forEach(([k], i) => { btns[i].setAttribute('aria-selected', k === key); btns[i].tabIndex = k === key ? 0 : -1; });
+        panel.setAttribute('aria-labelledby', 'adm-tab-' + key);
+        panel.replaceChildren(...list.find(x => x[0] === key)[3]());
+      }
+      pick(tab);
+      return h('div', { class: 'noor-adm-tabs' }, h('div', { class: 'noor-adm-tablist', role: 'tablist' }, btns), panel);
     }
     load();
   }

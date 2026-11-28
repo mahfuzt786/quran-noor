@@ -458,3 +458,15 @@ body:has(#player:not([hidden])) .upd { bottom: calc(108px + env(safe-area-inset-
 .noor-adm-pbtns, .noor-adm-nums { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px; }
 .noor-adm-pbtns .btn[disabled] { opacity: .4; pointer-events: none; }
 .noor-adm-pager[hidden] { display: none; }
+
+.noor-adm-tabs { margin: 28px 0 0; }
+.noor-adm-tablist { display: flex; gap: 4px; border-bottom: 1px solid var(--line, rgba(255,255,255,.12)); margin: 0 0 14px; overflow-x: auto; }
+.noor-adm-tab { appearance: none; background: none; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; padding: 10px 16px 11px;
+  font: inherit; font-size: 17px; color: var(--muted, #9aa3c7); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.noor-adm-tab:hover { color: var(--text); }
+.noor-adm-tab[aria-selected="true"] { color: var(--text); border-bottom-color: var(--gold, #e9b949); font-weight: 600; }
+.noor-adm-tab:focus-visible { outline: 2px solid var(--gold, #e9b949); outline-offset: -2px; border-radius: 6px 6px 0 0; }
+.noor-adm-count { font-size: 12px; font-weight: 600; line-height: 1; padding: 4px 8px; border-radius: 999px; background: rgba(233,185,73,.18); color: var(--text); }
+.noor-adm-tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; margin: 4px 0 10px; }
+.noor-adm-tools .noor-adm-search { margin: 0; flex: 1 1 260px; }
+.noor-adm-tools .btn[disabled] { opacity: .4; pointer-events: none; }
