@@ -10,6 +10,14 @@
   }).then(async r => ({ status: r.status, j: await r.json().catch(() => ({})) }));
 
   const day = (s) => { if (!s) return '—'; const d = new Date(s * 1000); return N().num(d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear()); };
+  const when = (s) => {
+    if (!s) return '—';
+    const m = Math.floor((Date.now() / 1000 - s) / 60);
+    if (m < 2) return window.Noor.t('ad_now');
+    if (m < 60) return window.Noor.t('ad_mins', window.Noor.num(m));
+    if (m < 1440) return window.Noor.t('ad_hours', window.Noor.num(Math.floor(m / 60)));
+    return day(s);
+  };
   const money = (amount, cur) => (cur === 'INR' ? '₹' : cur === 'USD' ? '$' : cur + ' ') + N().num((amount / 100).toFixed(amount % 100 ? 2 : 0));
 
   function view(app) {
@@ -52,7 +60,7 @@
           } }, t('ad_remove')),
           h('button', { class: 'btn', onclick: closeModal }, t('rc_cancel'))));
 
-      const grants = d.grants || [], pays = d.payments || [];
+      const grants = d.grants || [], pays = d.payments || [], users = d.users || [];
       const paid = pays.filter(p => p.status === 'captured');
       body.replaceChildren(
         h('div', { class: 'stats noor-adm-stats' },
@@ -70,6 +78,18 @@
                 h('td', {}, g.seen ? '✓ ' + day(g.seen) : t('ad_not_yet')),
                 h('td', {}, h('button', { class: 'btn sm', onclick: () => remove(g) }, t('ad_remove'))))))))
           : h('p', { class: 'muted' }, t('ad_free_none')),
+
+        h('h2', { class: 'subh' }, t('ad_users_t')),
+        h('p', { class: 'muted small' }, t('ad_users_d')),
+        users.length
+          ? h('div', { class: 'pg-tablewrap' }, h('table', { class: 'pg-rows' },
+              h('thead', {}, h('tr', {}, [t('ad_c_email'), t('ad_c_name'), t('ad_c_first'), t('ad_c_last'), t('ad_c_access'), t('ad_c_synced')].map(x => h('th', {}, x)))),
+              h('tbody', {}, users.map(u => h('tr', {},
+                h('td', {}, h('b', {}, u.email || '—')), h('td', {}, u.name || '—'),
+                h('td', {}, day(u.created)), h('td', {}, when(u.seen)),
+                h('td', {}, +u.paid ? '✓ ' + t('ad_paid') : +u.granted ? '✓ ' + t('ad_free') : t('ad_free_part')),
+                h('td', {}, u.synced ? day(u.synced) : '—'))))))
+          : h('p', { class: 'muted' }, t('ad_users_none')),
 
         h('h2', { class: 'subh' }, t('ad_pay_t')),
         pays.length

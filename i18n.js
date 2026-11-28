@@ -543,6 +543,13 @@ window.NOOR_I18N = {
   ad_c_date: ['Date', 'তাৰিখ'], ad_c_amount: ['Amount', 'পৰিমাণ'], ad_c_status: ['Status', 'অৱস্থা'], ad_c_account: ['Unlocks account', 'খোলা একাউণ্ট'], ad_c_id: ['Payment ID', 'পেমেণ্ট ID'],
   ad_not_yet: ['not yet', 'এতিয়ালৈকে নাই'],
   ad_pay_t: ['Payments', 'পেমেণ্ট'],
+  ad_users_t: ['Who has signed in', 'কোনে ছাইন ইন কৰিছে'],
+  ad_users_d: ['Every Google account that has signed in to Noor, most recently active first. "Last active" updates each time they open the app while signed in.', 'Noor-ত ছাইন ইন কৰা সকলো Google একাউণ্ট, শেহতীয়াকৈ সক্ৰিয়জন প্ৰথমে। ছাইন ইন হৈ থকা অৱস্থাত এপ খুলিলেই "শেষ সক্ৰিয়" সলনি হয়।'],
+  ad_users_none: ['Nobody has signed in yet.', 'এতিয়ালৈকে কোনেও ছাইন ইন কৰা নাই।'],
+  ad_c_name: ['Name', 'নাম'], ad_c_first: ['First sign-in', 'প্ৰথম ছাইন ইন'], ad_c_last: ['Last active', 'শেষ সক্ৰিয়'],
+  ad_c_access: ['Access', 'সুবিধা'], ad_c_synced: ['Progress saved', 'অগ্ৰগতি সংৰক্ষিত'],
+  ad_free: ['free', 'বিনামূলীয়া'], ad_free_part: ['free part only', 'কেৱল বিনামূলীয়া অংশ'],
+  ad_now: ['just now', 'এতিয়াই'], ad_mins: [(n) => `${n} min ago`, (n) => `${n} মিনিট আগতে`], ad_hours: [(n) => `${n} h ago`, (n) => `${n} ঘণ্টা আগতে`],
   ad_pay_none: ['No payments yet.', 'এতিয়ালৈকে কোনো পেমেণ্ট নাই।'],
   ad_paid: ['paid', 'পেমেণ্ট হৈছে'], ad_refunded: ['refunded', 'টকা ঘূৰাই দিয়া'], ad_unlinked: ['not linked yet', 'এতিয়ালৈকে যুক্ত হোৱা নাই'],
 
