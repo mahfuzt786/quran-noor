@@ -451,3 +451,10 @@ body:has(#player:not([hidden])) .upd { bottom: calc(108px + env(safe-area-inset-
 .noor-adm-body code { font-size: 12px; }
 .noor-adm-link { margin: 18px 0 0; }
 @media (max-width: 760px) { .noor-adm-add { grid-template-columns: 1fr; } .noor-adm-stats { grid-template-columns: repeat(3, 1fr); } }
+
+.noor-adm-search { width: 100%; max-width: 420px; margin: 4px 0 10px; }
+.noor-adm-paged .pg-tablewrap { margin-bottom: 8px; }
+.noor-adm-pager { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 26px; }
+.noor-adm-pbtns, .noor-adm-nums { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.noor-adm-pbtns .btn[disabled] { opacity: .4; pointer-events: none; }
+.noor-adm-pager[hidden] { display: none; }

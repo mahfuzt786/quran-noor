@@ -213,13 +213,13 @@ try {
             $pdo->prepare('DELETE FROM grants WHERE email = ?')->execute([norm_email((string)($b['email'] ?? ''))]);
         } elseif ($method !== 'GET') fail(405, 'method');
         $grants = $pdo->query('SELECT g.email, g.note, g.added_by, g.created, (SELECT max(seen) FROM users u WHERE lower(u.email) = g.email) AS seen FROM grants g ORDER BY g.created DESC')->fetchAll(PDO::FETCH_ASSOC);
-        $pays = $pdo->query('SELECT p.id, p.email, p.amount, p.currency, p.status, p.created, (SELECT email FROM users u WHERE u.sub = p.sub) AS account FROM payments p ORDER BY p.created DESC LIMIT 200')->fetchAll(PDO::FETCH_ASSOC);
+        $pays = $pdo->query('SELECT p.id, p.email, p.amount, p.currency, p.status, p.created, (SELECT email FROM users u WHERE u.sub = p.sub) AS account FROM payments p ORDER BY p.created DESC LIMIT 5000')->fetchAll(PDO::FETCH_ASSOC);
         $counts = ['users' => (int)$pdo->query('SELECT count(*) FROM users')->fetchColumn()];
         $users = $pdo->query("SELECT u.email, u.name, u.created, u.seen,
               EXISTS(SELECT 1 FROM payments p WHERE p.sub = u.sub AND p.status = 'captured') AS paid,
               EXISTS(SELECT 1 FROM grants g WHERE g.email = lower(u.email)) AS granted,
               (SELECT d.updated FROM docs d WHERE d.sub = u.sub) AS synced
-            FROM users u ORDER BY u.seen DESC LIMIT 500")->fetchAll(PDO::FETCH_ASSOC);
+            FROM users u ORDER BY u.seen DESC LIMIT 5000")->fetchAll(PDO::FETCH_ASSOC);
         out(200, ['grants' => $grants, 'payments' => $pays, 'users' => $users, 'counts' => $counts]);
     }
 

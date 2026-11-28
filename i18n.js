@@ -550,6 +550,11 @@ window.NOOR_I18N = {
   ad_c_access: ['Access', 'সুবিধা'], ad_c_synced: ['Progress saved', 'অগ্ৰগতি সংৰক্ষিত'],
   ad_free: ['free', 'বিনামূলীয়া'], ad_free_part: ['free part only', 'কেৱল বিনামূলীয়া অংশ'],
   ad_now: ['just now', 'এতিয়াই'], ad_mins: [(n) => `${n} min ago`, (n) => `${n} মিনিট আগতে`], ad_hours: [(n) => `${n} h ago`, (n) => `${n} ঘণ্টা আগতে`],
+  ad_search_users: ['Search by email, name or access', 'ইমেইল, নাম বা সুবিধাৰে বিচাৰক'],
+  ad_search_pays: ['Search by email, payment ID, amount or date', 'ইমেইল, পেমেণ্ট ID, পৰিমাণ বা তাৰিখেৰে বিচাৰক'],
+  ad_no_match: ['Nothing matches your search.', 'বিচৰা মতে একো পোৱা নগ’ল।'],
+  ad_showing: [(a, b, n) => `${a}–${b} of ${n}`, (a, b, n) => `${n}-ৰ ${a}–${b}`],
+  ad_prev: ['Previous', 'আগৰ'], ad_next: ['Next', 'পিছৰ'],
   ad_pay_none: ['No payments yet.', 'এতিয়ালৈকে কোনো পেমেণ্ট নাই।'],
   ad_paid: ['paid', 'পেমেণ্ট হৈছে'], ad_refunded: ['refunded', 'টকা ঘূৰাই দিয়া'], ad_unlinked: ['not linked yet', 'এতিয়ালৈকে যুক্ত হোৱা নাই'],
 

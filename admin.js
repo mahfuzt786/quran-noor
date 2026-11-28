@@ -20,6 +20,47 @@
   };
   const money = (amount, cur) => (cur === 'INR' ? '₹' : cur === 'USD' ? '$' : cur + ' ') + N().num((amount / 100).toFixed(amount % 100 ? 2 : 0));
 
+  const PER_PAGE = 15;
+  /* A table with a search box above it and page buttons below, 15 rows per page.
+     text(row) is what the search looks in; row(r) builds one <tr>. */
+  function paged(rows, heads, text, row, placeholder) {
+    const { h, t } = N();
+    let q = '', page = 0;
+    const input = h('input', { class: 'bm-note noor-adm-search', type: 'search', placeholder, 'aria-label': placeholder });
+    const tbody = h('tbody'), info = h('span', { class: 'muted small' });
+    const prev = h('button', { class: 'btn sm', 'aria-label': t('ad_prev') }, '‹ ' + t('ad_prev'));
+    const next = h('button', { class: 'btn sm', 'aria-label': t('ad_next') }, t('ad_next') + ' ›');
+    const nums = h('span', { class: 'noor-adm-nums' });
+    const empty = h('p', { class: 'muted', hidden: true }, t('ad_no_match'));
+    const wrap = h('div', { class: 'pg-tablewrap' }, h('table', { class: 'pg-rows' }, h('thead', {}, h('tr', {}, heads.map(x => h('th', {}, x)))), tbody));
+    const pager = h('div', { class: 'noor-adm-pager' }, info, h('span', { class: 'noor-adm-pbtns' }, prev, nums, next));
+    function draw() {
+      const words = q.toLowerCase().split(/\s+/).filter(Boolean);
+      const hits = words.length ? rows.filter(r => { const s = text(r).toLowerCase(); return words.every(w => s.includes(w)); }) : rows;
+      const pages = Math.max(1, Math.ceil(hits.length / PER_PAGE));
+      page = Math.min(page, pages - 1);
+      const from = page * PER_PAGE, shown = hits.slice(from, from + PER_PAGE);
+      tbody.replaceChildren(...shown.map(row));
+      wrap.hidden = !shown.length; empty.hidden = !!shown.length;
+      info.textContent = hits.length ? t('ad_showing', N().num(from + 1), N().num(from + shown.length), N().num(hits.length)) : '';
+      prev.disabled = page === 0; next.disabled = page >= pages - 1;
+      // page numbers: first, last, and the two either side of the current one
+      const want = [...new Set([0, pages - 1, page - 1, page, page + 1])].filter(i => i >= 0 && i < pages).sort((a, b) => a - b);
+      const parts = [];
+      want.forEach((i, k) => {
+        if (k && i - want[k - 1] > 1) parts.push(h('span', { class: 'muted' }, '…'));
+        parts.push(h('button', { class: 'btn sm' + (i === page ? ' gold' : ''), 'aria-current': i === page ? 'page' : null, onclick: () => { page = i; draw(); } }, N().num(i + 1)));
+      });
+      nums.replaceChildren(...parts);
+      pager.hidden = pages < 2 && !words.length;
+    }
+    prev.onclick = () => { page--; draw(); };
+    next.onclick = () => { page++; draw(); };
+    input.addEventListener('input', () => { q = input.value; page = 0; draw(); });
+    draw();
+    return h('div', { class: 'noor-adm-paged' }, input, wrap, empty, pager);
+  }
+
   function view(app) {
     const { h, t, footer, openModal, closeModal, toast } = N();
     const body = h('div', { class: 'noor-adm-body' }, h('div', { class: 'skeleton' }));
@@ -62,6 +103,8 @@
 
       const grants = d.grants || [], pays = d.payments || [], users = d.users || [];
       const paid = pays.filter(p => p.status === 'captured');
+      const access = (u) => +u.paid ? '✓ ' + t('ad_paid') : +u.granted ? '✓ ' + t('ad_free') : t('ad_free_part');
+      const status = (p) => p.status === 'captured' ? '✓ ' + t('ad_paid') : t('ad_refunded');
       body.replaceChildren(
         h('div', { class: 'stats noor-adm-stats' },
           [[grants.length, t('ad_s_free')], [paid.length, t('ad_s_paid')], [d.counts?.users ?? 0, t('ad_s_users')]]
@@ -82,23 +125,25 @@
         h('h2', { class: 'subh' }, t('ad_users_t')),
         h('p', { class: 'muted small' }, t('ad_users_d')),
         users.length
-          ? h('div', { class: 'pg-tablewrap' }, h('table', { class: 'pg-rows' },
-              h('thead', {}, h('tr', {}, [t('ad_c_email'), t('ad_c_name'), t('ad_c_first'), t('ad_c_last'), t('ad_c_access'), t('ad_c_synced')].map(x => h('th', {}, x)))),
-              h('tbody', {}, users.map(u => h('tr', {},
+          ? paged(users, [t('ad_c_email'), t('ad_c_name'), t('ad_c_first'), t('ad_c_last'), t('ad_c_access'), t('ad_c_synced')],
+              u => [u.email, u.name, access(u)].join(' '),
+              u => h('tr', {},
                 h('td', {}, h('b', {}, u.email || '—')), h('td', {}, u.name || '—'),
                 h('td', {}, day(u.created)), h('td', {}, when(u.seen)),
-                h('td', {}, +u.paid ? '✓ ' + t('ad_paid') : +u.granted ? '✓ ' + t('ad_free') : t('ad_free_part')),
-                h('td', {}, u.synced ? day(u.synced) : '—'))))))
+                h('td', {}, access(u)),
+                h('td', {}, u.synced ? day(u.synced) : '—')),
+              t('ad_search_users'))
           : h('p', { class: 'muted' }, t('ad_users_none')),
 
         h('h2', { class: 'subh' }, t('ad_pay_t')),
         pays.length
-          ? h('div', { class: 'pg-tablewrap' }, h('table', { class: 'pg-rows' },
-              h('thead', {}, h('tr', {}, [t('ad_c_date'), t('ad_c_email'), t('ad_c_amount'), t('ad_c_status'), t('ad_c_account'), t('ad_c_id')].map(x => h('th', {}, x)))),
-              h('tbody', {}, pays.map(p => h('tr', {},
+          ? paged(pays, [t('ad_c_date'), t('ad_c_email'), t('ad_c_amount'), t('ad_c_status'), t('ad_c_account'), t('ad_c_id')],
+              p => [p.email, p.account, p.id, p.currency, money(+p.amount, p.currency), status(p), day(p.created)].join(' '),
+              p => h('tr', {},
                 h('td', {}, day(p.created)), h('td', {}, p.email || '—'), h('td', {}, money(+p.amount, p.currency)),
-                h('td', {}, p.status === 'captured' ? '✓ ' + t('ad_paid') : t('ad_refunded')),
-                h('td', {}, p.account || t('ad_unlinked')), h('td', {}, h('code', {}, p.id)))))))
+                h('td', {}, status(p)),
+                h('td', {}, p.account || t('ad_unlinked')), h('td', {}, h('code', {}, p.id))),
+              t('ad_search_pays'))
           : h('p', { class: 'muted' }, t('ad_pay_none')));
     }
     load();
